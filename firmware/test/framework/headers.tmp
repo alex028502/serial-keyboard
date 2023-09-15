@@ -1,0 +1,65 @@
+extern "C" {
+#include <eeprom.h>
+}
+extern "C" {
+#include <gpio.h>
+}
+
+#include <serial.h>
+
+extern "C" void setup() __attribute__((used));
+extern "C" void loop() __attribute__((used));
+class SerialMock {
+ public:
+  int fd;
+  unsigned long baud;
+
+  void init(int fd);
+  void begin(unsigned long baud);
+  void print(const char* message);
+  void print(int value);
+  void printf(const char* format, ...);
+  void write(char value);
+  int available();
+  int parseInt();
+};
+
+extern SerialMock Serial;
+#ifdef EEPROM_H
+#error "EEPROM_H double include?"
+#endif
+#define EEPROM_H
+
+#include <stdint.h>  // for uint8_t
+
+typedef struct {
+  uint8_t (*read)(int);
+  void (*write)(int, uint8_t);
+  void (*clear)();
+} EEPROMStruct;
+
+extern EEPROMStruct EEPROM;
+
+uint8_t EEPROM_Read(int address);
+void EEPROM_Write(int address, uint8_t value);
+void EEPROM_Clear();
+#ifdef GPIO_H
+#error "GPIO_H double include?"
+#endif
+#define GPIO_H
+
+#define LED_BUILTIN 13
+
+#include <stdint.h>
+
+enum {
+  INPUT_PULLUP,
+  OUTPUT,
+};
+
+#define HIGH (1 == 1)
+#define LOW (1 == 0)
+
+void pinMode(uint8_t pin, uint8_t mode);
+uint8_t digitalRead(uint8_t pin);
+void digitalWrite(uint8_t pin, uint8_t value);

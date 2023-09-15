@@ -1,0 +1,15 @@
+*#*
+/lua
+/lua-*
+*.o
+*.so
+*.so
+/firmware/baud
+/vendor
+luacov.*.out
+*.gc*
+/coverage
+*.info
+/package
+*.deb
+*.coverage

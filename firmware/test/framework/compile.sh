@@ -1,0 +1,55 @@
+#! /usr/bin/env bash
+
+set -e
+
+source_files="serial.cpp eeprom.c gpio.c framework.c"
+
+if [[ "$@" == "" ]]
+then
+    echo $source_files
+    exit 0
+fi
+
+echo compiling with params $@
+
+dir=$(dirname $0)
+
+MAKE="$1 -C $dir"
+sut_obj_file=$2
+so=$3
+
+
+echo WATCH THIS:
+
+$MAKE version.txt
+
+LUA=$(cat $dir/version.txt)
+
+# modules="$dir/serial.cpp $dir/framework.c $dir/eeprom.c $dir/gpio.c"
+l="-lpthread -l$LUA"
+
+if nm $sut_obj_file | grep __gcov
+then
+    l="$l -lgcov"
+    # if/when this is an external framework, I am not sure if the following is
+    # necessary or advisable, since the users of the framework will not be
+    # interested in the coverage of the framework from their tests
+    # but it might not hurt
+    ext=".cov.o"
+else
+    ext=".o.o"
+fi
+
+module_names=""
+module_paths=""
+for f in $source_files
+do
+    module_names="$module_names $f$ext"
+    module_paths="$module_paths $dir/$f$ext"
+done
+
+$MAKE $module_names
+
+set -x
+
+exec g++ -shared -fPIC $module_paths $sut_obj_file $l -o $so

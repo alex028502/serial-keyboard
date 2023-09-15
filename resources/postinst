@@ -1,0 +1,37 @@
+#! /usr/bin/env bash
+
+set -e
+
+placeholder=SERIAL_NO
+config_file=/etc/udev/rules.d/99-serial-keyboard.rules
+
+# I think then maybe if I update the template the installer will ask which to
+# keep - but I am not sure what will happen if I don't update the device template
+# because I don't know if it keeps a hash of the original file or something
+
+function not-found {
+    echo NOT FOUND
+    echo please plug in your device and open another terminal and find the
+    echo serial number of your device by searching lsusb -v for FTDI
+    echo or if you have a more complicated requirement press return
+    echo and edit $config_file manually
+}
+
+echo CHECKING IF WE SHOULD HELP YOU CONFIGURE
+if [ "$DEBIAN_FRONTEND" != "noninteractive" ] && grep -w $placeholder $config_file
+then
+    echo we can help you configure your device serial number right now
+    echo if your device is plugged in you might be able to see it here:
+    lsusb -v | grep -i -e "ftdi" -A 3 -B 3 || not-found
+    echo to get the serial number
+    read -p "Enter device serial number: " serial
+    if [ "$serial" != "" ]
+    then
+        sed -i "s/$placeholder/$serial/" $config_file
+    fi
+fi
+
+systemctl daemon-reload
+udevadm control --reload-rules
+
+# sudo udevadm test $(udevadm info -q path -n /dev/ttyUSB0)

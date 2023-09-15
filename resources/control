@@ -1,0 +1,7 @@
+Package: serial-keyboard
+Name: Serial Keyboard
+Description: Serial Keyboard
+Maintainer: Not Maintained
+Version: { VERSION }
+Recommends: lua5.4
+Architecture: amd64

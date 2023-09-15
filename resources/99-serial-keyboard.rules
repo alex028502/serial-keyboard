@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", DRIVERS=="ftdi_sio", ENV{ID_SERIAL_SHORT}=="SERIAL_NO", ENV{SYSTEMD_WANTS}="serial-keyboard@%k.service"

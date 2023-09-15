@@ -1,0 +1,8 @@
+[Unit]
+Description=Serial Keyboard Driver
+
+[Service]
+ExecStart=/usr/share/serial-keyboard/start.sh /dev/%i
+
+[Install]
+WantedBy=multi-user.target

@@ -10,6 +10,10 @@ firmware=$(realpath $5)
 helper=$(realpath $6)
 baud=$(cat $7)
 
+# we could probably just pass in the path to the firmware project but we need
+# to change a few thigs about the make file or start moving to bash from make
+firmware_test_lib=$(dirname $firmware)/lib.sh
+
 echo ----------------------- E2E ---------------------------
 if echo $interpreter | grep luacov
 then
@@ -27,36 +31,15 @@ else
     echo c coverage: NO
 fi
 
-dev=./dev
-
-rm -rf $dev
-mkdir $dev
-
-processes=""
-
-function remember {
-    processes="$processes $@"
-}
+source $firmware_test_lib
+open-serial
 
 function cleanup {
-    echo
-    echo --------------------- CLEAN UP ------------------------
-    echo background process list
-    echo $processes | xargs -n2 echo
-    ids=$(echo $processes | xargs -n2 echo | awk '{ print $2 }')
-    echo kill $ids
-    kill $ids || echo nothing to clean-up
-    rm -rfv $dev
-    echo -------------------------------------------------------
-    echo
+    # wrapper so that we can see in the coverage report that it gets run
+    _cleanup
 }
 
 trap cleanup EXIT
-
-echo ---- OPEN SERIAL --------
-socat -d -d pty,raw,echo=0,link=$dev/serial pty,raw,echo=0,link=$dev/serial.interface &
-remember serial $!
-sleep 1
 echo ---- OPEN FAKE UINPUT ---
 socat -d -d pty,raw,echo=0,link=$dev/uinput pty,raw,echo=0,link=$dev/uinput.interface &
 remember uinput $!

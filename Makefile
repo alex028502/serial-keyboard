@@ -12,14 +12,18 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-test-all: check-format clean-coverage
+all: coverage/bash
+coverage/bash: always
+	rm -rf $@
+	bashcov entry.sh
+main-test: check-format clean-coverage
 	$(MAKE) assert-clean-coverage
 	$(MAKE) -C firmware test
 	$(MAKE) assert-clean-coverage
 	$(MAKE) test
 	$(MAKE) assert-clean-coverage
-	$(MAKE) coverage
-coverage: coverage.info luacov lcov tests.desc
+	$(MAKE) coverage/main
+coverage/main: coverage.info luacov lcov tests.desc
 	rm -rf $@
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details
 tests.desc: coverage.info

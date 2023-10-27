@@ -15,3 +15,4 @@ luacov.*.out
 *.coverage
 /*-files.txt
 /tests.desc
+!/coverage/index.html

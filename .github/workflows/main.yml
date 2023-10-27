@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: install bashcov
+        shell: bash
+        run: sudo gem install bashcov
       - name: apt deps
         shell: bash
         run: sudo apt-get install luarocks liblua5.4-dev lua5.4 lcov socat
@@ -28,7 +31,7 @@ jobs:
         run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
         # thanks https://stackoverflow.com/a/61699863
       - name: test
-        run: make test-all
+        run: make
         # run: eval "$(luarocks --lua-version 5.4 path --bin)" && make test-all
       - name: Upload test coverage
         uses: actions/upload-artifact@v2

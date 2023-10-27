@@ -8,7 +8,7 @@
 /vendor
 luacov.*.out
 *.gc*
-/coverage
+/coverage/*
 *.info
 /package
 *.deb

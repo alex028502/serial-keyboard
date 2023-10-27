@@ -16,3 +16,4 @@ luacov.*.out
 /*-files.txt
 /tests.desc
 !/coverage/index.html
+/tmp

@@ -33,9 +33,10 @@ coverage.info: firmware.labeled.info e2e.labeled.info empty.labeled.info
 empty.coverage.info: empty.raw.info
 	lcov -a $< -t empty -o $@
 empty.raw.info: firmware.coverage.info e2e.coverage.info
-	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > checked-files.txt
-	./list.sh lua c cpp ino | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > all-files.txt
-	comm -3 all-files.txt checked-files.txt | xargs ./no-coverage.sh > $@
+	mkdir -p tmp
+	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > tmp/checked-files.txt
+	./list.sh lua c cpp ino | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > tmp/all-files.txt
+	comm -3 tmp/all-files.txt tmp/checked-files.txt | xargs ./no-coverage.sh > $@
 %.labeled.info: %.coverage.info
 	sed "s|TN:|TN:$*|" $< > $@
 firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile

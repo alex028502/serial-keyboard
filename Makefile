@@ -10,6 +10,7 @@ C_COVERAGE_PATTERN = '*.gcda'
 LUA_COVERAGE_PATTERN = 'luacov.*.out'
 
 test-all: luacov lcov check-format
+	! ./list.sh | sed 's/ /SPACE/' | grep SPACE # no spaces in paths
 	find . -name $(C_COVERAGE_PATTERN) | xargs rm -vf
 	find . -name $(LUA_COVERAGE_PATTERN) | xargs rm -vf
 	$(MAKE) assert-clean-coverage
@@ -24,7 +25,11 @@ test-all: luacov lcov check-format
 	sed 's|SF:|SF:firmware/|' firmware/luacov.report.out > firmware.coverage
 	lcov --capture --directory . --output-file c.coverage
 	lcov -a c.coverage -a luacov.report.out -a firmware.coverage -o coverage.info
-	genhtml coverage.info --output-directory coverage
+	grep SF coverage.info | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > checked-files.txt
+	./list.sh lua c cpp ino | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > all-files.txt
+	comm -3 all-files.txt checked-files.txt | xargs ./no-coverage.sh > no-coverage.info
+	lcov -a coverage.info -a no-coverage.info -o all.info
+	genhtml all.info --output-directory coverage
 assert-clean-coverage:
 	! find . -name $(C_COVERAGE_PATTERN) | grep '.'
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'

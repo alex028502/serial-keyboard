@@ -13,3 +13,4 @@ luacov.*.out
 /package
 *.deb
 *.coverage
+/*-files.txt

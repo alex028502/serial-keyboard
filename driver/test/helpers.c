@@ -27,20 +27,6 @@ static int l_event_size(lua_State* L) {
   return 1;
 }
 
-static int l_split_events(lua_State* L) {
-  size_t len;
-  const char* data = luaL_checklstring(L, 1, &len);
-  int event_count = len / sizeof(struct input_event);
-  int i;
-
-  for (i = 0; i < event_count; ++i) {
-    const char* event_data = data + i * sizeof(struct input_event);
-    lua_pushlstring(L, event_data, sizeof(struct input_event));
-  }
-
-  return event_count;
-}
-
 static int l_sleep(lua_State* L) {
   float ms = luaL_checknumber(L, 1);
   usleep(ms * 1000);
@@ -93,10 +79,11 @@ static int l_get_constants(lua_State* L) {
   return 1;
 }
 
-static const luaL_Reg helperlib[] = {
-    {"read_key_event", l_read_key_event}, {"split_events", l_split_events},
-    {"get_constants", l_get_constants},   {"sleep", l_sleep},
-    {"event_size", l_event_size},         {NULL, NULL}};
+static const luaL_Reg helperlib[] = {{"read_key_event", l_read_key_event},
+                                     {"get_constants", l_get_constants},
+                                     {"sleep", l_sleep},
+                                     {"event_size", l_event_size},
+                                     {NULL, NULL}};
 
 int luaopen_helpers(lua_State* L) {
   luaL_newlib(L, helperlib);

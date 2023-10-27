@@ -2,8 +2,8 @@ local lib_path = arg[1]
 local input_device_path = arg[2]
 local uinput_device_path = arg[3]
 
-local lib_table, lib_error = package.loadlib(lib_path,
-                                             "luaopen_serial_keyboard_lib")
+local lib_table, lib_error =
+   package.loadlib(lib_path, "luaopen_serial_keyboard_lib")
 assert(not lib_error, lib_error)
 lib = lib_table()
 

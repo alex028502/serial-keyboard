@@ -41,5 +41,5 @@ return {
    assert_truthy = assert_truthy,
    import = import,
    BUTTON_PIN = 2,
-   DEFAULT_CODE = 53
+   DEFAULT_CODE = 53,
 }

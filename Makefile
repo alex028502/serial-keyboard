@@ -28,13 +28,13 @@ test-all: luacov lcov check-format
 assert-clean-coverage:
 	! find . -name $(C_COVERAGE_PATTERN) | grep '.'
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'
-check-format: lua-format clang-format $(EXE)
+check-format: stylua clang-format $(EXE)
 	./list.sh c cpp h ino | xargs clang-format --style=Chromium -Werror --dry-run
-	./list.sh lua | xargs -n1 lua-format --check
+	./list.sh lua | xargs $< --check
 	! ./list.sh | xargs grep -rnH '.*\s$$'
 	! ./list.sh | grep -v Makefile | grep -vw mk | xargs grep -nHP '\t'
 	./list.sh | xargs -n1 $(EXE) newline.lua
-clang-format lua-format luacov lcov:
+clang-format stylua luacov lcov:
 	which $@
 $(EXE):
 	make -C $(@D) $(@F)

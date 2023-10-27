@@ -18,7 +18,6 @@ end
 fake_device = package.loadlib(sut_path, "luaopen_sut")()
 
 local uinput_interface = io.open(uinput_interface_path, "rb")
-helpers.set_fd_nonblocking(uinput_interface)
 
 function assert_ioctl(f, ...)
    local line = f:read("*L")

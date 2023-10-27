@@ -29,7 +29,6 @@ local serial = io.open(serial_path, "r+")
 local serial_interface = io.open(serial_interface_path, "r+")
 library.assert_truthy(serial, "serial port that connects to computer")
 library.assert_truthy(serial_interface, "serial port to control simulation")
--- helpers.set_fd_nonblocking(serial_interface)
 
 fake_device.serial_init(serial_interface)
 fake_device.clear_eeprom()

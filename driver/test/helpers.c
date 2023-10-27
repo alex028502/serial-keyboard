@@ -1,4 +1,3 @@
-#include <fcntl.h>
 #include <lauxlib.h>
 #include <linux/uinput.h>
 #include <lua.h>
@@ -40,17 +39,6 @@ static int l_split_events(lua_State* L) {
   }
 
   return event_count;
-}
-
-static int l_set_fd_nonblocking(lua_State* L) {
-  luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
-  FILE* fp = stream->f;
-  int fd = fileno(fp);
-
-  int flags = fcntl(fd, F_GETFL, 0);
-  fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-
-  return 0;
 }
 
 static int l_sleep(lua_State* L) {
@@ -106,13 +94,9 @@ static int l_get_constants(lua_State* L) {
 }
 
 static const luaL_Reg helperlib[] = {
-    {"read_key_event", l_read_key_event},
-    {"split_events", l_split_events},
-    {"set_fd_nonblocking", l_set_fd_nonblocking},
-    {"get_constants", l_get_constants},
-    {"sleep", l_sleep},
-    {"event_size", l_event_size},
-    {NULL, NULL}};
+    {"read_key_event", l_read_key_event}, {"split_events", l_split_events},
+    {"get_constants", l_get_constants},   {"sleep", l_sleep},
+    {"event_size", l_event_size},         {NULL, NULL}};
 
 int luaopen_helpers(lua_State* L) {
   luaL_newlib(L, helperlib);

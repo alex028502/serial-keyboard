@@ -41,9 +41,7 @@ function cleanup {
 
 trap cleanup EXIT
 echo ---- OPEN FAKE UINPUT ---
-socat -d -d pty,raw,echo=0,link=$dev/uinput pty,raw,echo=0,link=$dev/uinput.interface &
-remember uinput $!
-sleep 1
+mkfifo $dev/uinput
 echo
 echo ---- START DRIVER -------
 # this one has one more option when in coverage mode
@@ -65,6 +63,6 @@ kill -0 $driver_id
 
 echo
 echo ---- TEST ALL -----------
-$interpreter $(dirname $0)/e2e.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput.interface $baud
+$interpreter $(dirname $0)/e2e.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput $baud
 echo sleep 1
 echo ---- SUCCESS -----------

@@ -14,6 +14,9 @@ baud=$(cat $7)
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lib=$(dirname $firmware)/lib.sh
 
+echo ----------------------- UNIT --------------------------
+$interpreter $(dirname $0)/keyevent.lua $library $helper
+echo
 echo ----------------------- E2E ---------------------------
 if echo $interpreter | grep luacov
 then

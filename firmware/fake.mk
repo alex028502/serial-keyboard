@@ -12,6 +12,11 @@ test: $(EXE) test/sut.so baud.txt
 	test/test.sh $^
 coverage: test/sut.cov.so baud.txt $(EXE)
 	test/test.sh "$(EXE) -lluacov" $< baud.txt
+	$(MAKE) -f $(MAKEFILE_LIST) baud-coverage
+baud-coverage: baud.txt baud.cov
+	./baud.cov | diff - $<
+baud.cov: baud.c SerialKeyboard/baud.h
+	gcc -fprofile-arcs -ftest-coverage $< -o $@
 baud.txt: always
 	$(MAKE) $@
 test/sut%so: test/sketch%o always

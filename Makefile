@@ -1,4 +1,4 @@
-.PHONY: test always-execute clang-format coverage clean-coverage
+.PHONY: test always-execute clang-format _coverage coverage clean-coverage
 
 GIT_HASH := dev
 
@@ -9,24 +9,48 @@ ASSERTION_LIB = firmware/test/framework/library.lua
 C_COVERAGE_PATTERN = '*.gcda'
 LUA_COVERAGE_PATTERN = 'luacov.*.out'
 
-test-all: luacov lcov check-format clean-coverage
+ALL_FILES := $(shell ./list.sh)
+ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
+
+test-all: check-format clean-coverage
 	$(MAKE) assert-clean-coverage
 	$(MAKE) -C firmware test
+	$(MAKE) assert-clean-coverage
 	$(MAKE) test
 	$(MAKE) assert-clean-coverage
 	$(MAKE) coverage
-	$< -r lcov
-	! $(MAKE) assert-clean-coverage
-	$(MAKE) -C firmware coverage
-	cd firmware && $< -r lcov
-	sed 's|SF:|SF:firmware/|' firmware/luacov.report.out > firmware.coverage
-	lcov --capture --directory . --output-file c.coverage
-	lcov -a c.coverage -a luacov.report.out -a firmware.coverage -o coverage.info
-	grep SF coverage.info | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > checked-files.txt
+coverage: coverage.info luacov lcov tests.desc
+	rm -rf $@
+	genhtml $< --output-directory $@ --description-file tests.desc --show-details
+tests.desc: coverage.info
+	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
+coverage.info: firmware.labeled.info e2e.labeled.info empty.labeled.info
+	echo $^ | xargs -n1 echo -a | xargs lcov -o $@
+empty.coverage.info: empty.raw.info
+	lcov -a $< -t empty -o $@
+empty.raw.info: firmware.coverage.info e2e.coverage.info
+	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > checked-files.txt
 	./list.sh lua c cpp ino | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > all-files.txt
-	comm -3 all-files.txt checked-files.txt | xargs ./no-coverage.sh > no-coverage.info
-	lcov -a coverage.info -a no-coverage.info -o all.info
-	genhtml all.info --output-directory coverage
+	comm -3 all-files.txt checked-files.txt | xargs ./no-coverage.sh > $@
+%.labeled.info: %.coverage.info
+	sed "s|TN:|TN:$*|" $< > $@
+firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
+	$(MAKE) clean-coverage
+	$(MAKE) assert-clean-coverage
+	$(MAKE) -C firmware coverage
+	! $(MAKE) assert-clean-coverage
+	cd firmware && luacov -r lcov
+	sed 's|SF:|SF:firmware/|' firmware/luacov.report.out > firmware.lua.info
+	lcov --capture --directory . --output-file firmware.c.info
+	lcov -a firmware.lua.info -a firmware.c.info -o $@
+e2e.coverage.info: $(ALL_FILES)
+	$(MAKE) clean-coverage
+	$(MAKE) assert-clean-coverage
+	$(MAKE) _coverage
+	! $(MAKE) assert-clean-coverage
+	luacov -r lcov
+	lcov --capture --directory . -o e2e.c.info
+	lcov -a luacov.report.out -a e2e.c.info -o $@
 clean-coverage:
 	find . -name $(C_COVERAGE_PATTERN) | xargs rm -vf
 	find . -name $(LUA_COVERAGE_PATTERN) | xargs rm -vf
@@ -42,19 +66,17 @@ check-format: stylua clang-format $(EXE)
 	./list.sh | xargs -n1 $(EXE) newline.lua
 clang-format stylua luacov lcov:
 	which $@
-$(EXE):
-	make -C $(@D) $(@F)
 test: $(EXE) driver/serial_keyboard_lib.main.so firmware/test/sut.so driver/test/helpers.main.so firmware/baud.txt
 	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) $^
-coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.txt
+_coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.txt
 	make $(EXE)
 	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) "$(EXE) -lluacov" $^
-driver/%: always
-	$(MAKE) -C driver $*
-firmware/test/framework/%: always
-	$(MAKE) -C $(D@) $(F@)
-firmware/%: always
-	$(MAKE) -C firmware $*
+driver/%.so: always
+	$(MAKE) -C driver $*.so
+$(EXE):
+	make -C $(@D) $(@F)
+firmware/%.so: always
+	$(MAKE) -C firmware $*.so
 always:
 serial-keyboard.deb: package
 	dpkg-deb --build $< $@

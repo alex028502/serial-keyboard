@@ -17,6 +17,7 @@ $(PROJECT_LIB).%.so: test/ioctl.%.o $(PROJECT_LIB).%.o
 test/helpers.%.so: test/helpers.%.o
 	gcc -shared -o $@ -fPIC -l$(LUA) $^ $(if $(filter cov,$*),-lgcov,)
 %.cov.o: %.c Makefile
+	rm -f $@.gcno
 	gcc -c -o $@ $(COV) -fPIC $< -I $(LUA_SRC)
 %.main.o: %.c Makefile
 	gcc -c -o $@ -fPIC $< -I $(LUA_SRC)

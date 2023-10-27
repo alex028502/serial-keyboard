@@ -10,7 +10,6 @@ C_COVERAGE_PATTERN = '*.gcda'
 LUA_COVERAGE_PATTERN = 'luacov.*.out'
 
 test-all: luacov lcov check-format
-	! ./list.sh | sed 's/ /SPACE/' | grep SPACE # no spaces in paths
 	find . -name $(C_COVERAGE_PATTERN) | xargs rm -vf
 	find . -name $(LUA_COVERAGE_PATTERN) | xargs rm -vf
 	$(MAKE) assert-clean-coverage
@@ -34,6 +33,7 @@ assert-clean-coverage:
 	! find . -name $(C_COVERAGE_PATTERN) | grep '.'
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'
 check-format: stylua clang-format $(EXE)
+	! ./list.sh | sed 's/ /SPACE/' | grep SPACE # no spaces in paths
 	./list.sh c cpp h ino | xargs clang-format --style=Chromium -Werror --dry-run
 	./list.sh lua | xargs $< --check
 	! ./list.sh | xargs grep -rnH '.*\s$$'

@@ -9,8 +9,8 @@ static int l_read_key_event(lua_State* L) {
   size_t len;
   const char* data = luaL_checklstring(L, 1, &len);
 
-  if (len < sizeof(struct input_event)) {
-    return luaL_error(L, "Insufficient data");
+  if (len != sizeof(struct input_event)) {
+    return luaL_error(L, "Size Mismatch");
   }
 
   struct input_event* ev = (struct input_event*)data;

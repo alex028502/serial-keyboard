@@ -17,8 +17,5 @@ end
 library.assert_truthy(try_read_key_event(test_string(0)), "base case")
 
 -- this is what needs to be tested
-library.assert_falsy(try_read_key_event(test_string(-1)), "why we are here")
-
--- this doesn't really matter - if it happens we are in trouble
--- more like just describing what it would do - but an error would also be ok
-library.assert_truthy(try_read_key_event(test_string(1)), "not important")
+library.assert_falsy(try_read_key_event(test_string(-1)), "too small")
+library.assert_falsy(try_read_key_event(test_string(1)), "too big")

@@ -1,4 +1,4 @@
-.PHONY: test always-execute clang-format coverage
+.PHONY: test always-execute clang-format coverage clean-coverage
 
 GIT_HASH := dev
 
@@ -9,9 +9,7 @@ ASSERTION_LIB = firmware/test/framework/library.lua
 C_COVERAGE_PATTERN = '*.gcda'
 LUA_COVERAGE_PATTERN = 'luacov.*.out'
 
-test-all: luacov lcov check-format
-	find . -name $(C_COVERAGE_PATTERN) | xargs rm -vf
-	find . -name $(LUA_COVERAGE_PATTERN) | xargs rm -vf
+test-all: luacov lcov check-format clean-coverage
 	$(MAKE) assert-clean-coverage
 	$(MAKE) -C firmware test
 	$(MAKE) test
@@ -29,6 +27,9 @@ test-all: luacov lcov check-format
 	comm -3 all-files.txt checked-files.txt | xargs ./no-coverage.sh > no-coverage.info
 	lcov -a coverage.info -a no-coverage.info -o all.info
 	genhtml all.info --output-directory coverage
+clean-coverage:
+	find . -name $(C_COVERAGE_PATTERN) | xargs rm -vf
+	find . -name $(LUA_COVERAGE_PATTERN) | xargs rm -vf
 assert-clean-coverage:
 	! find . -name $(C_COVERAGE_PATTERN) | grep '.'
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'

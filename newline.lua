@@ -16,4 +16,6 @@ if content:sub(-1) ~= "\n" then
    end
    print(filename .. ":" .. line_no .. ":1 does not end with a newline.")
    os.exit(1)
+else
+   os.exit(0)
 end

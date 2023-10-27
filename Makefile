@@ -12,6 +12,8 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
+COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info
+
 all: coverage/bash
 coverage/bash: always
 	rm -rf $@
@@ -28,11 +30,11 @@ coverage/main: coverage.info luacov lcov tests.desc
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details
 tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
-coverage.info: firmware.labeled.info e2e.labeled.info empty.labeled.info
+coverage.info: $(COVERAGE_FILES) empty.labeled.info
 	echo $^ | xargs -n1 echo -a | xargs lcov -o $@
 empty.coverage.info: empty.raw.info
 	lcov -a $< -t empty -o $@
-empty.raw.info: firmware.coverage.info e2e.coverage.info
+empty.raw.info: $(COVERAGE_FILES)
 	mkdir -p tmp
 	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > tmp/checked-files.txt
 	./list.sh lua c cpp ino | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > tmp/all-files.txt
@@ -56,6 +58,24 @@ e2e.coverage.info: $(ALL_FILES)
 	luacov -r lcov
 	lcov --capture --directory . -o e2e.c.info
 	lcov -a luacov.report.out -a e2e.c.info -o $@
+tools.coverage.info: $(ALL_FILES)
+	$(MAKE) clean-coverage
+	$(MAKE) assert-clean-coverage
+	./list.sh | xargs -n1 $(EXE) -lluacov newline.lua
+	! $(MAKE) assert-clean-coverage
+	luacov -r lcov
+	lcov -a luacov.report.out -o $@
+failure.coverage.info: tmp/nonewline.txt $(ALL_FILES)
+	$(MAKE) clean-coverage
+	$(MAKE) assert-clean-coverage
+	! $(EXE) -lluacov newline.lua $<
+	! $(MAKE) assert-clean-coverage
+	luacov -r lcov
+	lcov -a luacov.report.out -o $@
+tmp/nonewline.txt: Makefile
+	mkdir -p $(@D)
+	echo hello > $@
+	echo -n world >> $@
 clean-coverage:
 	find . -name $(C_COVERAGE_PATTERN) | xargs rm -vf
 	find . -name $(LUA_COVERAGE_PATTERN) | xargs rm -vf

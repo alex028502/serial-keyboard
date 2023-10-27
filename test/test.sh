@@ -44,9 +44,8 @@ function cleanup {
     echo background process list
     echo $processes | xargs -n2 echo
     ids=$(echo $processes | xargs -n2 echo | awk '{ print $2 }')
-    set -x
+    echo kill $ids
     kill $ids || echo nothing to clean-up
-    set +x
     rm -rfv $dev
     echo -------------------------------------------------------
     echo

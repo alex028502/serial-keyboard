@@ -50,6 +50,4 @@ done
 
 $MAKE $module_names
 
-set -x
-
 exec g++ -shared -fPIC $module_paths $sut_obj_file $l -o $so

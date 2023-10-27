@@ -4,12 +4,6 @@ set -e
 
 source_files="serial.cpp eeprom.c gpio.c framework.c"
 
-if [[ "$@" == "" ]]
-then
-    echo $source_files
-    exit 0
-fi
-
 echo compiling with params $@
 
 dir=$(dirname $0)

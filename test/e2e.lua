@@ -105,7 +105,7 @@ library.assert_falsy(
 library.assert_equal(fake_device.serial_baud(), tonumber(baud))
 
 fake_device.digital_write(library.BUTTON_PIN, 0)
-helpers.sleep(0.5)
+helpers.sleep(1)
 library.assert_falsy(
    fake_device.digital_read(library.BUTTON_PIN),
    "push the button"

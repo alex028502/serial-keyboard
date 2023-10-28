@@ -6,8 +6,7 @@ print("cpath: " .. package.cpath)
 -- well not so much the arduino program as the fake framework
 -- I mean the sketch worked right away
 
-local sut_path, library_path, serial_path, serial_interface_path, baud =
-   table.unpack(arg)
+local sut_path, library_path, baud = table.unpack(arg)
 
 library = dofile(library_path)
 print("fake device path", sut_path)
@@ -25,12 +24,9 @@ library.assert_truthy(library.BUTTON_PIN, "make sure it's loaded")
 LED_PIN = fake_device.led_builtin()
 print("led pin is " .. LED_PIN)
 
-local serial = io.open(serial_path, "r+")
-local serial_interface = io.open(serial_interface_path, "r+")
+local serial = fake_device.serial_init()
 library.assert_truthy(serial, "serial port that connects to computer")
-library.assert_truthy(serial_interface, "serial port to control simulation")
 
-fake_device.serial_init(serial_interface)
 fake_device.clear_eeprom()
 library.assert_equal(fake_device.serial_baud(), 0)
 fake_device.start()

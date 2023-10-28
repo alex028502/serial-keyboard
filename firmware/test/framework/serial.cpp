@@ -1,13 +1,30 @@
 #include "serial.h"
 #include <ctype.h>
+#include <pty.h>    // for openpty
 #include <stdio.h>  // for sprintf
 #include <stdlib.h>
 #include <sys/ioctl.h>
-#include <unistd.h>  // for write
-#include <cstring>   // for strlen
+#include <termios.h>  // for termios structure
+#include <unistd.h>   // for write
+#include <cstring>    // for strlen
 
-void SerialMock::init(int fd) {
-  this->fd = fd;
+int SerialMock::init() {
+  struct termios termios_attr;
+  int tty;
+  if (openpty(&this->fd, &tty, nullptr, &termios_attr, nullptr) == -1) {
+    perror("Failed to create PTY pair");
+    exit(EXIT_FAILURE);
+  }
+
+  // Modify termios_attr to disable certain flags
+  termios_attr.c_iflag &= ~(IGNCR | ICRNL | INLCR);
+  termios_attr.c_oflag &= ~OPOST;
+
+  // Apply the modified termios settings
+  tcsetattr(this->fd, TCSANOW, &termios_attr);
+  tcsetattr(tty, TCSANOW, &termios_attr);
+
+  return tty;
 }
 
 void SerialMock::begin(unsigned long baud) {
@@ -52,8 +69,8 @@ int SerialMock::parseInt() {
 
 SerialMock Serial;
 
-extern "C" void Serial_init(int fd) {
-  Serial.init(fd);
+extern "C" int Serial_init() {
+  return Serial.init();
 }
 
 extern "C" unsigned long Serial_baud() {

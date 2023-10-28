@@ -1,10 +1,8 @@
 #include "serial.h"
 #include <ctype.h>
-#include <stdarg.h>
 #include <stdio.h>  // for sprintf
 #include <stdlib.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 #include <unistd.h>  // for write
 #include <cstring>   // for strlen
 

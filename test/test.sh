@@ -65,7 +65,17 @@ echo see if it started:
 kill -0 $driver_id
 
 echo
+echo ---- TEST DRIVER INIT ---
+# because the driver is only started once the init is only tested once
+# the serial port should not affect anything here but might need to exist
+$interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $baud
+
+echo
+echo ---- TEST DRIVER --------
+$interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial.interface $dev/uinput $baud
+
+echo
 echo ---- TEST ALL -----------
-$interpreter $(dirname $0)/e2e.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput $baud
+$interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput $baud
 echo sleep 1
 echo ---- SUCCESS -----------

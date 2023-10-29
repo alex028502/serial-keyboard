@@ -25,3 +25,11 @@ function _cleanup {
     echo -------------------------------------------------------
     echo
 }
+
+function open-serial {
+    echo ---- OPEN SERIAL --------
+    socat -d -d pty,raw,echo=0,link=$dev/serial pty,raw,echo=0,link=$dev/serial.interface &
+    remember serial $!
+    sleep 1
+    echo
+}

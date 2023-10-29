@@ -6,6 +6,8 @@ interpreter="$1"
 sut=$(realpath $2)
 baud=$(cat $3)
 
+source $(dirname $0)/lib.sh
+
 echo ------------------ FIRMWARE TEST ----------------------
 if echo $interpreter | grep luacov
 then
@@ -24,7 +26,15 @@ fi
 test_script=$(dirname $0)/test.lua
 test_lib=$(dirname $0)/framework/library.lua
 
+function cleanup {
+    # wrapper so that we can see in the coverage report that it gets run
+    _cleanup
+}
+
+trap cleanup EXIT
+
+open-serial
 echo ---- TEST FIRMWARE ------
-$interpreter $test_script $sut $test_lib $baud
+$interpreter $test_script $sut $test_lib $dev/serial $dev/serial.interface $baud
 echo ---- SUCCESS ------------
 echo

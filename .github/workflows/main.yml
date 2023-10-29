@@ -15,7 +15,7 @@ jobs:
         run: sudo gem install bashcov
       - name: apt deps
         shell: bash
-        run: sudo apt-get install luarocks liblua5.4-dev lua5.4 lcov
+        run: sudo apt-get install luarocks liblua5.4-dev lua5.4 lcov socat
       - name: check for lua
         shell: bash
         run: which echo && which lua && which lua5.4 && lua -v && lua5.4 -v

@@ -19,7 +19,7 @@ print("\nnow the real thing")
 
 LED_PIN = fake_device.led_builtin()
 
-serial_interface = fake_device.serial_init()
+fake_device.serial_init(serial_interface)
 fake_device.clear_eeprom()
 fake_device.start()
 helpers.sleep(0.5)

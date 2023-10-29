@@ -8,7 +8,7 @@
 
 extern void setup();
 extern void loop();
-extern int Serial_init();
+extern void Serial_init(int fd);
 extern unsigned long Serial_baud();
 
 static char running;
@@ -46,26 +46,12 @@ static int l_digitalWrite(lua_State* L) {
   return 0;
 }
 
-static int lua_fclose(lua_State* L) {
-  luaL_Stream* stream = (luaL_Stream*)luaL_checkudata(L, 1, LUA_FILEHANDLE);
-  if (stream != NULL && stream->f != NULL) {
-    fclose(stream->f);
-    stream->f = NULL;
-  }
-  return 0;
-}
-
 static int l_Serial_init(lua_State* L) {
-  int tty = Serial_init();
-
-  luaL_Stream* stream = (luaL_Stream*)lua_newuserdata(L, sizeof(luaL_Stream));
-  luaL_getmetatable(L, LUA_FILEHANDLE);
-  lua_setmetatable(L, -2);
-
-  stream->f = fdopen(tty, "r+");
-  stream->closef = lua_fclose;  // Use your custom close function
-
-  return 1;
+  luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
+  FILE* fp = stream->f;
+  int fd = fileno(fp);
+  Serial_init(fd);
+  return 0;
 }
 
 static int l_Serial_baud(lua_State* L) {

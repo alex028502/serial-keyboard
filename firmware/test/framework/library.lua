@@ -1,14 +1,10 @@
-local function fmt(a)
-   return tostring(a).gsub(a, "\r", "^M")
-end
-
 local function assert_equal(a, b, message)
    if message == nil then
       m = "assert_equal"
    else
       m = message
    end
-   assert(a == b, m .. "\n" .. fmt(a) .. "vs\n" .. fmt(b))
+   assert(a == b, m .. "\n" .. tostring(a) .. "vs\n" .. tostring(b))
 end
 
 local function assert_in(a, b, message)

@@ -3,7 +3,7 @@ class SerialMock {
   int fd;
   unsigned long baud;
 
-  int init();
+  void init(int fd);
   void begin(unsigned long baud);
   void print(const char* message);
   void print(int value);

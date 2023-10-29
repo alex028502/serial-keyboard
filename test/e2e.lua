@@ -35,7 +35,7 @@ library.assert_falsy(
 library.assert_equal(fake_device.serial_baud(), tonumber(baud))
 
 fake_device.digital_write(library.BUTTON_PIN, 0)
-helpers.sleep(1)
+check_next(uinput_interface, library.DEFAULT_CODE, 1)
 library.assert_falsy(
    fake_device.digital_read(library.BUTTON_PIN),
    "push the button"
@@ -44,10 +44,9 @@ library.assert_truthy(
    fake_device.digital_read(LED_PIN),
    "high led matches low button"
 )
-check_next(uinput_interface, library.DEFAULT_CODE, 1)
 
 fake_device.digital_write(library.BUTTON_PIN, 1)
-helpers.sleep(0.1)
+check_next(uinput_interface, library.DEFAULT_CODE, 0)
 library.assert_truthy(
    fake_device.digital_read(library.BUTTON_PIN),
    "stop pushing"
@@ -56,7 +55,6 @@ library.assert_falsy(
    fake_device.digital_read(LED_PIN),
    "low led matches high button"
 )
-check_next(uinput_interface, library.DEFAULT_CODE, 0)
 
 local serial = io.open(serial_path, "w")
 local new_code = 77
@@ -66,7 +64,7 @@ serial:close()
 helpers.sleep(0.5)
 
 fake_device.digital_write(library.BUTTON_PIN, 0)
-helpers.sleep(0.1)
+check_next(uinput_interface, new_code, 1)
 library.assert_falsy(
    fake_device.digital_read(library.BUTTON_PIN),
    "push the button"
@@ -75,10 +73,9 @@ library.assert_truthy(
    fake_device.digital_read(LED_PIN),
    "high led matches low button"
 )
-check_next(uinput_interface, new_code, 1)
 
 fake_device.digital_write(library.BUTTON_PIN, 1)
-helpers.sleep(0.2)
+check_next(uinput_interface, new_code, 0)
 library.assert_truthy(
    fake_device.digital_read(library.BUTTON_PIN),
    "stop pushing"
@@ -87,7 +84,6 @@ library.assert_falsy(
    fake_device.digital_read(LED_PIN),
    "low led matches high button"
 )
-check_next(uinput_interface, new_code, 0)
 
 fake_device.stop()
 helpers.sleep(0.5)

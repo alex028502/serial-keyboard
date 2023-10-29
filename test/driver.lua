@@ -19,7 +19,6 @@ local serial_interface = io.open(serial_interface_path, "r+")
 print("opened " .. serial_interface_path .. " temporarily for wrinting") ]]
 serial_interface:write("D22\n")
 serial_interface:flush()
-helpers.sleep(1)
 
 print("event size is " .. helpers.event_size())
 

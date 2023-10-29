@@ -20,10 +20,8 @@ echo
 echo ----------------------- E2E PREP ----------------------
 if echo $interpreter | grep luacov
 then
-    i="$interpreter -lluacov.tick"
     echo lua coverage: YES
 else
-    i="$interpreter"
     echo lua coverage: NO
 fi
 
@@ -82,9 +80,20 @@ echo ---- TEST E2E -----------
 # two way pty is still needed for this test because the fake arduino will open
 # the serial path for read and write - and the driver will also want to open
 # for read - so a single path won't work
+mkfifo $dev/serial_connector
 open-serial
+# the fifo seems to close better than the socat pty - or I don't know the
+# setting for the socat pty that will make it close nicely like the fifo
+# but maybe if there is a way, somebody will answer someday
+# https://unix.stackexchange.com/questions/760016
+sleep 1
+cat > $dev/serial_connector < $dev/serial &
+cat_pid=$!
+remember cat $cat_pid
+sleep .1
+kill -0 $cat_pid
 echo ---- start driver -------
-SERIAL_KEYBOARD_DEBUG=TRUE $i $driver_script $driver_lib $dev/serial $dev/uinput &
+$interpreter $driver_script $driver_lib $dev/serial_connector $dev/uinput &
 driver_id=$!
 remember driver2 $driver_id
 echo see if it started:
@@ -95,4 +104,15 @@ $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $baud
 echo ---- test all -----------
 $interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput $baud
 echo sleep 1
+kill -0 $driver_id
+# we didn't save the id in a variable so we can look it up in the process list
+socat_pid=$(echo $processes | xargs -n2 echo | grep -w serial | awk '{ print $2 }')
+kill -0 $socat_pid
+kill $socat_pid
+sleep 2
+set +e
+kill -0 $driver_id
+driver_running_result=$?
+set -e
+[ "$driver_running_result" = 1 ]
 echo ---- SUCCESS -----------

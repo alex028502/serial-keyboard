@@ -11,6 +11,10 @@ local syn_byte_str = lib.get_syn_event()
 
 lib.make_ctrl_c_work() -- first things first
 
+local function pass()
+   -- do nothing
+end
+
 local function send_event(f, action, code)
    local byte_str = lib.get_key_event(code, action)
    f:write(byte_str)
@@ -21,6 +25,8 @@ end
 function debug_message(message)
    if os.getenv("SERIAL_KEYBOARD_DEBUG") then
       print(message)
+   else
+      pass()
    end
 end
 

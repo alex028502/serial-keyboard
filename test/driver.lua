@@ -24,4 +24,14 @@ print("event size is " .. helpers.event_size())
 
 check_next(uinput_interface, 22, 1)
 
+-- send some garbage to prove it can handle it
+-- and then another message
+
+serial_interface:write("test\n")
+serial_interface:write("\n")
+serial_interface:write("U22\n")
+serial_interface:flush()
+
+check_next(uinput_interface, 22, 0)
+
 print("driver alone seems ok")

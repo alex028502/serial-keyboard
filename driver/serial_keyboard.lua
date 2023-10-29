@@ -57,18 +57,14 @@ local file = io.open(input_device_path, "rb")
 print("driver has opened " .. input_device_path .. " for reading")
 
 for line in file:lines() do
-   if line then
-      debug_message("sending " .. line)
-      local action_str, code_str = string.match(line, "(%a)(%d+)")
-      local action = (action_str == "D") and 1 or 0
-      local keycode = tonumber(code_str)
-      if keycode then
-         send_event(uinput_file, action, keycode)
-      else
-         print("error")
-      end
+   debug_message("sending " .. line)
+   local action_str, code_str = string.match(line, "(%a)(%d+)")
+   local action = (action_str == "D") and 1 or 0
+   local keycode = tonumber(code_str)
+   if keycode then
+      send_event(uinput_file, action, keycode)
    else
-      pass()
+      print("error")
    end
 end
 

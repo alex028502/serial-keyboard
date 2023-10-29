@@ -103,7 +103,6 @@ echo ---- test driver init ---
 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $baud
 echo ---- test all -----------
 $interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput $baud
-echo sleep 1
 kill -0 $driver_id
 # we didn't save the id in a variable so we can look it up in the process list
 socat_pid=$(echo $processes | xargs -n2 echo | grep -w serial | awk '{ print $2 }')

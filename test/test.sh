@@ -17,7 +17,7 @@ firmware_test_lib=$(dirname $firmware)/lib.sh
 echo ----------------------- UNIT --------------------------
 $interpreter $(dirname $0)/keyevent.lua $library $helper
 echo
-echo ----------------------- E2E ---------------------------
+echo ----------------------- E2E PREP ----------------------
 if echo $interpreter | grep luacov
 then
     i="$interpreter -lluacov.tick"
@@ -35,7 +35,6 @@ else
 fi
 
 source $firmware_test_lib
-open-serial
 
 function cleanup {
     # wrapper so that we can see in the coverage report that it gets run
@@ -46,30 +45,54 @@ trap cleanup EXIT
 echo ---- OPEN FAKE UINPUT ---
 mkfifo $dev/uinput
 echo
-echo ---- START DRIVER -------
+echo ---- COVERAGE OPTIONS ---
 # this one has one more option when in coverage mode
 echo using interpreter $i from $interpreter
+echo \(in cases where program does not end cleanly\)
 
-SERIAL_KEYBOARD_DEBUG=TRUE $i $driver_script $driver_lib $dev/serial $dev/uinput &
-
+echo
+echo ---- TEST DRIVER --------
+mkfifo $dev/serial
+echo ---- start driver -------
+SERIAL_KEYBOARD_DEBUG=TRUE $interpreter $driver_script $driver_lib $dev/serial $dev/uinput &
 driver_id=$!
 remember driver $driver_id
 sleep 1
 echo see if it started:
 kill -0 $driver_id
-
-echo
-echo ---- TEST DRIVER INIT ---
-# because the driver is only started once the init is only tested once
+echo ---- test driver init ---
 # the serial port should not affect anything here but might need to exist
 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $baud
+echo ---- test driver --------
+$interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud
+echo ---- clean up ------------
+rm $dev/serial
+sleep 2
+echo check if driver is still running
+set +e
+kill -0 $driver_id
+driver_running_result=$?
+set -e
+[ "$driver_running_result" = 1 ]
+# will remain in the process list
+# so will try to TERM it again in cleanup
 
 echo
-echo ---- TEST DRIVER --------
-$interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial.interface $dev/uinput $baud
-
-echo
-echo ---- TEST ALL -----------
+echo ---- TEST E2E -----------
+# two way pty is still needed for this test because the fake arduino will open
+# the serial path for read and write - and the driver will also want to open
+# for read - so a single path won't work
+open-serial
+echo ---- start driver -------
+SERIAL_KEYBOARD_DEBUG=TRUE $i $driver_script $driver_lib $dev/serial $dev/uinput &
+driver_id=$!
+remember driver2 $driver_id
+echo see if it started:
+kill -0 $driver_id
+echo ---- test driver init ---
+# the serial port should not affect anything here but might need to exist
+$interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $baud
+echo ---- test all -----------
 $interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput $baud
 echo sleep 1
 echo ---- SUCCESS -----------

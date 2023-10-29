@@ -9,8 +9,6 @@ lib = lib_table()
 
 local syn_byte_str = lib.get_syn_event()
 
-lib.make_ctrl_c_work() -- first things first
-
 local function pass()
    -- do nothing
 end
@@ -53,14 +51,6 @@ else
 end
 
 print("driver has set up uinput device")
-
-if lib.exit_trap(uinput_file) ~= 0 then
-   error("Failed to set up exit trap")
-else
-   pass()
-end
-
-print("driver has set up exit trap")
 
 local file = io.open(input_device_path, "rb")
 

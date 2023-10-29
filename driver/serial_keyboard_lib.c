@@ -2,7 +2,6 @@
 #include <linux/uinput.h>
 #include <lua.h>
 #include <lualib.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,34 +11,6 @@ int call_ioctl(int fd, unsigned long request, ...);
 
 // read the following to know what all this means
 // https://www.kernel.org/doc/html/v4.12/input/uinput.html
-
-static void cleanup() {
-  // actually just let use know when the program exited
-  printf("ALL DONE\n");
-}
-
-static int l_exit_trap(lua_State* L) {
-  luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
-  FILE* fp = stream->f;
-  // exit_fd = fileno(fp);
-  atexit(cleanup);
-  lua_pushinteger(L, 0);
-  return 1;
-}
-
-void handle_sigint(int sig) {
-  printf("Caught signal %d, converting to SIGTERM\n", sig);
-  kill(getpid(), SIGTERM);
-}
-
-static int l_make_ctrl_c_work(lua_State* L) {
-  // cleanup will be skipped
-  // only unplugging the device makes it end nicely
-  // but that's what will usually happen
-  signal(SIGINT, handle_sigint);
-  lua_pushinteger(L, 0);
-  return 1;
-}
 
 // https://github.com/LuaJIT/LuaJIT/issues/262#issuecomment-269938853
 static int l_setup_device(lua_State* L) {
@@ -119,15 +90,12 @@ static int l_destroy(lua_State* L) {
   call_ioctl(fd, UI_DEV_DESTROY, 0);
 }
 
-static const luaL_Reg lib_functions[] = {
-    {"make_ctrl_c_work", l_make_ctrl_c_work},
-    {"destroy", l_destroy},
-    {"sleep", l_sleep},
-    {"exit_trap", l_exit_trap},
-    {"get_key_event", l_get_key_event},
-    {"get_syn_event", l_get_syn_event},
-    {"setup_device", l_setup_device},
-    {NULL, NULL}};
+static const luaL_Reg lib_functions[] = {{"destroy", l_destroy},
+                                         {"sleep", l_sleep},
+                                         {"get_key_event", l_get_key_event},
+                                         {"get_syn_event", l_get_syn_event},
+                                         {"setup_device", l_setup_device},
+                                         {NULL, NULL}};
 
 int luaopen_serial_keyboard_lib(lua_State* L) {
   luaL_newlib(L, lib_functions);

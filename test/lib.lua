@@ -1,18 +1,7 @@
-local function wait_for_next_event(helpers, f)
-   for i = 1, 4 do
-      local event = f:read(helpers.event_size())
-      if event then
-         return event
-      else
-         helpers.sleep(0.2 * i)
-      end
-   end
-end
-
 local function check_next(library, helpers, f, code, action)
    local constants = helpers.get_constants()
-   local main_event = wait_for_next_event(helpers, f)
-   local syn_event = wait_for_next_event(helpers, f)
+   local main_event = f:read(helpers.event_size())
+   local syn_event = f:read(helpers.event_size())
    library.assert_truthy(main_event, "something written a least")
    library.assert_truthy(syn_event, "something written a least")
    local main_type, main_code, main_value = helpers.read_key_event(main_event)

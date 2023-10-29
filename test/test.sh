@@ -48,12 +48,6 @@ mkfifo $dev/uinput
 echo
 echo ---- START DRIVER -------
 # this one has one more option when in coverage mode
-if echo $interpreter | grep luacov
-then
-    i="$interpreter -lluacov.tick"
-else
-    i="$interpreter"
-fi
 echo using interpreter $i from $interpreter
 
 SERIAL_KEYBOARD_DEBUG=TRUE $i $driver_script $driver_lib $dev/serial $dev/uinput &

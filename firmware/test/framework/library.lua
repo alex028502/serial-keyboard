@@ -1,18 +1,10 @@
 local function assert_equal(a, b, message)
-   if message == nil then
-      m = "assert_equal"
-   else
-      m = message
-   end
+   m = "assert_equal"
    assert(a == b, m .. "\n" .. tostring(a) .. "vs\n" .. tostring(b))
 end
 
 local function assert_in(a, b, message)
-   if message == nil then
-      m = "assert_in"
-   else
-      m = message
-   end
+   m = "assert_in"
    assert(string.find(b, a) ~= nil, m .. ": " .. a .. " not in\n" .. b)
 end
 

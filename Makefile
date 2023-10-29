@@ -18,13 +18,15 @@ all: coverage/bash
 coverage/bash: always
 	rm -rf $@
 	bashcov entry.sh
-main-test: check-format clean-coverage
+main-test: check-format clean-coverage bash-tools
 	$(MAKE) assert-clean-coverage
 	$(MAKE) -C firmware test
 	$(MAKE) assert-clean-coverage
 	$(MAKE) test
 	$(MAKE) assert-clean-coverage
 	$(MAKE) coverage/main
+bash-tools:
+	! ./if-else.sh if-else.txt
 coverage/main: coverage.info luacov lcov tests.desc
 	rm -rf $@
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details

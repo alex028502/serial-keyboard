@@ -13,10 +13,11 @@ for f in $@
 do
     if_count=$(wordcount if $f)
     else_count=$(wordcount else $f)
-    if [ "$if_count" -ne "$else_count" ]
+    if [ "$if_count" = "$else_count" ]
     then
-        e=1
-        echo $f:1:1: if/else mismatch $if_count ifs and $else_count elses
+        continue
     fi
+    e=1
+    echo $f:1:1: if/else mismatch $if_count ifs and $else_count elses
 done
 exit $e

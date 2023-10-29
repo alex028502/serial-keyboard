@@ -16,6 +16,12 @@ firmware_test_lib=$(dirname $firmware)/lib.sh
 
 echo ----------------------- UNIT --------------------------
 $interpreter $(dirname $0)/keyevent.lua $library $helper
+echo unit passed
+echo ----------------------- LOOKUP ------------------------
+test_code=EV_KEY
+actual_value=$($interpreter $(dirname $0)/lookup.lua $library $helper $test_code)
+echo got $actual_value for $test_code
+[ 1 = "$actual_value" ]
 echo
 echo ----------------------- E2E PREP ----------------------
 if echo $interpreter | grep luacov
@@ -114,4 +120,34 @@ kill -0 $driver_id
 driver_running_result=$?
 set -e
 [ "$driver_running_result" = 1 ]
+echo ----------------------- ERRORS ------------------------
+mkfifo $dev/serial
+# complete coverage by trying out all the special error handling
+function test-error {
+    cat < $dev/uinput > /dev/null &
+    remember $1-cat $!
+    set +e
+    timeout 1.2 $interpreter $driver_script $driver_lib $dev/serial $dev/uinput
+    stat=$?
+    set -e
+    sign=$2
+    expectation="$stat $sign 124"
+    echo $expectation for $1
+    [ $expectation ]
+}
+
+for ioctl_code in UI_SET_EVBIT UI_SET_KEYBIT UI_DEV_SETUP UI_DEV_CREATE
+do
+    ioctl_code_number=$($interpreter $(dirname $0)/lookup.lua $library $helper $ioctl_code)
+    echo checking that a failure of $ioctl_code\($ioctl_code_number\) causes failure
+    IOCTL_ERROR=$ioctl_code_number test-error $ioctl_code -ne
+done
+
+test-error normal-start "="
+
+rm $dev/uinput
+mkdir $dev/uinput
+
+test-error bad-uinput -ne
+echo ^^^^^ test error ^^^^^^
 echo ---- SUCCESS -----------

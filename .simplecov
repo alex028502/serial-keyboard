@@ -1,5 +1,6 @@
 ignore_list = [
   "coverage",
+  "firmware/.arduino",
 ]
 
 SimpleCov.add_filter ignore_list

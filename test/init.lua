@@ -23,9 +23,10 @@ function assert_ioctl(f, ...)
       expected_line = expected_line .. v
       if i < select("#", ...) then
          expected_line = expected_line .. " "
+      else
+         expected_line = expected_line .. "\n"
       end
    end
-   expected_line = expected_line .. "\n"
 
    library.assert_equal(expected_line, line)
 end

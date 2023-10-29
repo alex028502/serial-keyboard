@@ -89,6 +89,7 @@ check-format: stylua clang-format $(EXE)
 	! ./list.sh | xargs grep -rnH '.*\s$$'
 	! ./list.sh | grep -v Makefile | grep -vw mk | xargs grep -nHP '\t'
 	./list.sh | xargs -n1 $(EXE) newline.lua
+	./list.sh lua | xargs ./if-else.sh
 clang-format stylua luacov lcov:
 	which $@
 test: $(EXE) driver/serial_keyboard_lib.main.so firmware/test/sut.so driver/test/helpers.main.so firmware/baud.txt

@@ -41,17 +41,23 @@ print("driver has opened " .. uinput_device_path .. " for writing")
 
 if uinput_file == nil then
    error("Failed to open /dev/uinput.")
+else
+   pass()
 end
 
 local device_setup_result = lib.setup_device(uinput_file)
 if device_setup_result ~= 0 then
    error("Failed to set up uinput device. " .. device_setup_result)
+else
+   pass()
 end
 
 print("driver has set up uinput device")
 
 if lib.exit_trap(uinput_file) ~= 0 then
    error("Failed to set up exit trap")
+else
+   pass()
 end
 
 print("driver has set up exit trap")
@@ -71,6 +77,8 @@ for line in file:lines() do
       else
          print("error")
       end
+   else
+      pass()
    end
 end
 

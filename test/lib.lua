@@ -3,8 +3,9 @@ local function wait_for_next_event(helpers, f)
       local event = f:read(helpers.event_size())
       if event then
          return event
+      else
+         helpers.sleep(0.2 * i)
       end
-      helpers.sleep(0.2 * i)
    end
 end
 

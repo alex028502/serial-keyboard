@@ -6,19 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
 
 int call_ioctl(int fd, unsigned long request, ...);
-
-int l_is_device_connected(lua_State* L) {
-  int status;
-  luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
-  FILE* fp = stream->f;
-  int fd = fileno(fp);
-  lua_pushinteger(L, ioctl(fd, TIOCMGET, &status) >= 0);
-  return 1;
-}
 
 // read the following to know what all this means
 // https://www.kernel.org/doc/html/v4.12/input/uinput.html
@@ -130,7 +120,6 @@ static int l_destroy(lua_State* L) {
 }
 
 static const luaL_Reg lib_functions[] = {
-    {"is_device_connected", l_is_device_connected},
     {"make_ctrl_c_work", l_make_ctrl_c_work},
     {"destroy", l_destroy},
     {"sleep", l_sleep},

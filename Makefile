@@ -15,6 +15,7 @@ ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info
 
 all: coverage/bash
+	cat $</index.html | grep '%' | head -n1 | grep -w 100
 coverage/bash: always
 	rm -rf $@
 	bashcov entry.sh

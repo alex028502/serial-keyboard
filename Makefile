@@ -94,9 +94,9 @@ check-format: stylua clang-format $(EXE)
 	./list.sh lua | xargs ./if-else.sh
 clang-format stylua luacov lcov:
 	which $@
-test: $(EXE) driver/serial_keyboard_lib.main.so firmware/test/sut.so driver/test/helpers.main.so firmware/baud.txt
+test: $(EXE) driver/serial_keyboard_lib.main.so firmware/test/sut.so driver/test/helpers.main.so firmware/baud
 	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) $^
-_coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.txt
+_coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.cov
 	make $(EXE)
 	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) "$(EXE) -lluacov" $^
 driver/%.so: always
@@ -116,11 +116,11 @@ package: always
 	cp resources/99-serial-keyboard.rules $@/etc/udev/rules.d
 	echo /etc/udev/rules.d/99-serial-keyboard.rules > $@/DEBIAN/conffiles
 	cp resources/postinst $@/DEBIAN
-	cp resources/serial-keyboard@.service $@/etc/systemd/system
+	sed 's|INST|/usr/share/serial-keyboard|g' resources/serial-keyboard@.service > $@/etc/systemd/system/serial-keyboard@.service
 	$(MAKE) $@/usr/share/serial-keyboard
 	$(MAKE) $@/DEBIAN/control
 package/DEBIAN/control: resources/control
 	sed "s/{ VERSION }/$(shell date +"%Y%m%d%H%M%S").$(GIT_HASH)/" $< > $@
 package/usr/share/serial-keyboard: firmware/baud driver/serial_keyboard.lua driver/serial_keyboard_lib.so
 	mkdir -p $@
-	cp resources/start.sh $^ $@
+	cp $^ $@

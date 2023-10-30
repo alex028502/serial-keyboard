@@ -1,4 +1,5 @@
-local helper_path, library_path, uinput_interface_path, baud = table.unpack(arg)
+local helper_path, library_path, uinput_interface_path, serial_path, baud =
+   table.unpack(arg)
 
 print("library path", library_path)
 print("helper path", helper_path)
@@ -7,6 +8,16 @@ library = dofile(library_path)
 
 helpers = library.import(helper_path, "luaopen_helpers")
 library.assert_truthy(library.BUTTON_PIN, "make sure it's loaded")
+
+local serial_file = io.open(serial_path, "r")
+assert(serial_file, serial_path)
+
+local serial_content = serial_file:read("*l")
+serial_file:close() -- this is where using fifo to mock serial is gonna get a bit shaky
+library.assert_in("-echo", serial_content)
+library.assert_in(serial_path, serial_content)
+library.assert_in(baud, serial_content)
+
 local constants = helpers.get_constants()
 print("\nthese will come in handy when checking errors")
 for k, v in pairs(constants) do

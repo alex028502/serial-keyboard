@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+# mock stty
+# you can do tty settings from within a lua program by using termios in c
+# except it is too hard to mock for testing - this can make sure that stty is
+# called as expected, but we will still need manual testing to see if it works
+
+device_path=$(echo $@ | xargs -n1 echo | grep /)
+echo SETTINGS $@
+echo WRITING SETTINGS TO $device_path
+echo stty $@ > $device_path

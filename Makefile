@@ -12,10 +12,11 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info
+COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info
 
 all: coverage/bash
 	cat $</index.html | grep '%' | head -n1 | grep -w 100
+	$(MAKE) missed-files
 coverage/bash: always
 	rm -rf $@
 	bashcov entry.sh
@@ -31,17 +32,17 @@ bash-tools:
 coverage/main: coverage.info luacov lcov tests.desc
 	rm -rf $@
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details
+	lcov --summary $<
+	lcov --summary $< | grep lines | grep 100
 tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
-coverage.info: $(COVERAGE_FILES) empty.labeled.info
+coverage.info: $(COVERAGE_FILES)
 	echo $^ | xargs -n1 echo -a | xargs lcov -o $@
-empty.coverage.info: empty.raw.info
-	lcov -a $< -t empty -o $@
-empty.raw.info: $(COVERAGE_FILES)
+missed-files: coverage.info
 	mkdir -p tmp
 	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > tmp/checked-files.txt
 	./list.sh lua c cpp ino | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > tmp/all-files.txt
-	comm -3 tmp/all-files.txt tmp/checked-files.txt | xargs ./no-coverage.sh > $@
+	diff tmp/all-files.txt tmp/checked-files.txt
 %.labeled.info: %.coverage.info
 	sed "s|TN:|TN:$*|" $< > $@
 firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
@@ -50,9 +51,15 @@ firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	$(MAKE) -C firmware coverage
 	! $(MAKE) assert-clean-coverage
 	cd firmware && luacov -r lcov
-	sed 's|SF:|SF:firmware/|' firmware/luacov.report.out > firmware.lua.info
+	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > firmware.lua.info
 	lcov --capture --directory . --output-file firmware.c.info
 	lcov -a firmware.lua.info -a firmware.c.info -o $@
+ioctl.coverage.info: driver/bytes.cov $(ALL_FILES)
+	$(MAKE) clean-coverage
+	$(MAKE) assert-clean-coverage
+	./test/ioctl.sh driver/bytes.cov
+	! $(MAKE) assert-clean-coverage
+	lcov --capture --directory . --output-file $@
 e2e.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
@@ -102,7 +109,7 @@ _coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/tes
 	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) "$(EXE) -lluacov" $^
 driver/%.so: always
 	$(MAKE) -C driver $*.so
-$(EXE):
+driver/bytes.cov $(EXE):
 	make -C $(@D) $(@F)
 firmware/%.so: always
 	$(MAKE) -C firmware $*.so

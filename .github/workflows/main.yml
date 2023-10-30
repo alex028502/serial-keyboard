@@ -1,6 +1,9 @@
 name: test and build
+name: test and build
 on:
   push:
+    branches:
+      - master
   schedule:
     - cron: '0 0 1 * *'
 

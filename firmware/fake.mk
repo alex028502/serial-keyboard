@@ -8,8 +8,6 @@ FRAMEWORK = test/framework
 
 COMPILE = gcc -c -fPIC -I test/framework -include test/framework/Arduino.h -x c++
 
-test: $(EXE) test/sut.so baud.txt
-	test/test.sh $^
 coverage: test/sut.cov.so baud.txt $(EXE)
 	test/test.sh "$(EXE) -lluacov" $< baud.txt
 	$(MAKE) -f $(MAKEFILE_LIST) baud-coverage

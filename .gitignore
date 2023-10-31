@@ -17,3 +17,5 @@ luacov.*.out
 /tests.desc
 !/coverage/index.html
 /tmp
+/.bashcov
+/report

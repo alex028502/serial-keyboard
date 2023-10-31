@@ -14,28 +14,30 @@ ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
 COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info
 
-all: coverage/bash
-	cat $</index.html | grep '%' | head -n1 | grep -w 100
-	$(MAKE) missed-files
-coverage/bash: always
-	rm -rf $@
-	bashcov entry.sh
-main-test: check-format bash-tools coverage/main
-bash-tools:
-	! ./if-else.sh if-else.txt
-coverage/main: coverage.info luacov lcov tests.desc
+all: lcov report missed-files ascii-report coverage-check
+ascii-report: coverage.info
+	lcov --list $<
+	lcov --summary $<
+coverage-check: coverage.info
+	lcov --summary $< | grep lines | grep 100
+report: coverage.info tests.desc
 	rm -rf $@
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details
-	lcov --summary $<
-	lcov --summary $< | grep lines | grep 100
+bash-tools:
+	! ./if-else.sh if-else.txt
 tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
-coverage.info: $(COVERAGE_FILES)
-	echo $^ | xargs -n1 echo -a | xargs lcov -o $@
+coverage/main: coverage.info  tests.desc
+	rm -rf $@
+coverage.info: clean
+	bashcov ./entry.sh $(COVERAGE_FILES)
+	cat .bashcov/lcov/serial-keyboard.lcov | sed 's|SF:\./|TN:\nSF:$(PWD)/|' > bash.coverage.info
+	$(MAKE) bash.labeled.info
+	echo $(COVERAGE_FILES) bash.labeled.info | xargs -n1 echo -a | xargs lcov -o $@
 missed-files: coverage.info
 	mkdir -p tmp
 	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > tmp/checked-files.txt
-	./list.sh lua c cpp ino | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > tmp/all-files.txt
+	./list.sh lua c cpp ino sh stty | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > tmp/all-files.txt
 	diff tmp/all-files.txt tmp/checked-files.txt
 %.labeled.info: %.coverage.info
 	sed "s|TN:|TN:$*|" $< > $@
@@ -124,3 +126,6 @@ package/DEBIAN/control: resources/control
 package/usr/share/serial-keyboard: firmware/baud driver/serial_keyboard.lua driver/serial_keyboard_lib.so
 	mkdir -p $@
 	cp $^ $@
+clean:
+	find -type f | git check-ignore --stdin | grep -v '.git' | xargs rm -f
+

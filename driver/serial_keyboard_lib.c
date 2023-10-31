@@ -14,7 +14,6 @@ int call_ioctl(int fd, unsigned long request, ...);
 
 // https://github.com/LuaJIT/LuaJIT/issues/262#issuecomment-269938853
 static int l_setup_device(lua_State* L) {
-  printf("WATCH THIS\n");
   luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
   FILE* fp = stream->f;
   int fd = fileno(fp);

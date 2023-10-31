@@ -12,9 +12,6 @@ MAKE="$1 -C $dir"
 sut_obj_file=$2
 so=$3
 
-
-echo WATCH THIS:
-
 $MAKE version.txt
 
 LUA=$(cat $dir/version.txt)

@@ -61,7 +61,7 @@ static int l_Serial_baud(lua_State* L) {
 }
 
 static int l_clear_EEPROM(lua_State* L) {
-  EEPROM.clear();
+  EEPROM_Clear();
   return 0;
 }
 

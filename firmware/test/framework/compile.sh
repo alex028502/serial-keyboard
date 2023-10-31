@@ -2,7 +2,7 @@
 
 set -e
 
-source_files="serial.cpp eeprom.c gpio.c framework.c"
+source_files="serial.cpp EEPROM.cpp gpio.c framework.c"
 
 echo compiling with params $@
 

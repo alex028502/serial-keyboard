@@ -33,20 +33,6 @@ echo got $actual_value for $test_code
 [ 1 = "$actual_value" ]
 echo
 echo ----------------------- E2E PREP ----------------------
-if echo $interpreter | grep luacov
-then
-    echo lua coverage: YES
-else
-    echo lua coverage: NO
-fi
-
-if nm $firmware | grep __gcov > /dev/null
-then
-    echo c coverage: YES
-else
-    echo c coverage: NO
-fi
-
 source $firmware_test_lib
 
 function cleanup {

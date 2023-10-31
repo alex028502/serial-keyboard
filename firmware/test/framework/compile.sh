@@ -22,17 +22,12 @@ LUA=$(cat $dir/version.txt)
 # modules="$dir/serial.cpp $dir/framework.c $dir/eeprom.c $dir/gpio.c"
 l="-lpthread -l$LUA"
 
-if nm $sut_obj_file | grep __gcov
-then
-    l="$l -lgcov"
-    # if/when this is an external framework, I am not sure if the following is
-    # necessary or advisable, since the users of the framework will not be
-    # interested in the coverage of the framework from their tests
-    # but it might not hurt
-    ext=".cov.o"
-else
-    ext=".o.o"
-fi
+l="$l -lgcov"
+# if/when this is an external framework, I am not sure if the following is
+# necessary or advisable, since the users of the framework will not be
+# interested in the coverage of the framework from their tests
+# but it might not hurt
+ext=".cov.o"
 
 module_names=""
 module_paths=""

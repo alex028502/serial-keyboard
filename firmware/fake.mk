@@ -21,8 +21,6 @@ baud.txt: always
 	$(MAKE) $@
 test/sut%so: test/sketch%o always
 	test/framework/compile.sh "$(MAKE)" $< $@
-test/sketch.o: $(SKETCH)
-	$(COMPILE) $< -o $@
 test/sketch.cov.o: $(SKETCH)
 	$(COMPILE) -fprofile-arcs -ftest-coverage $< -o $@
 always:

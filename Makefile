@@ -31,7 +31,7 @@ coverage/main: coverage.info  tests.desc
 	rm -rf $@
 coverage.info: clean
 	bashcov ./entry.sh $(COVERAGE_FILES)
-	cat .bashcov/lcov/serial-keyboard.lcov | sed 's|SF:\./|SF:$(PWD)/|' > bash.coverage.info
+	cat .bashcov/lcov/serial-keyboard.lcov | sed 's|SF:\./|TN:\nSF:$(PWD)/|' > bash.coverage.info
 	$(MAKE) bash.labeled.info
 	echo $(COVERAGE_FILES) bash.labeled.info | xargs -n1 echo -a | xargs lcov -o $@
 missed-files: coverage.info

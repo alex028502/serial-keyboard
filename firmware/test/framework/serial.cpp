@@ -8,6 +8,9 @@
 
 void SerialMock::init(int fd) {
   this->fd = fd;
+  incoming_number[0] = 0;
+  incoming_number_idx = 0;
+  outgoing_number = 0;
 }
 
 void SerialMock::begin(unsigned long baud) {
@@ -35,19 +38,44 @@ int SerialMock::available() {
 }
 
 int SerialMock::parseInt() {
-  char buffer[32] = {0};
-  char c;
-  int index = 0;
+  /*
+    This method is implemented to act just like the real method in a few
+    limited cases. I considered using Stream.cpp which seems to be the same
+    for all the cores I looked at, but I decided to just make it pass a bunch
+    of tests that I wrote by looking at how the real device behaved.
 
-  while (index < sizeof(buffer) - 1) {
+    What would be really cool is writing tests that could be run against this
+    library, and a real device (or VM) and then _triangulating_ this
+    implementation against the real thing. Then people who had their own
+    projects could confidently use this mock library knowing that we have done
+    the work of comparing it to a real device.
+   */
+  while (available()) {
+    char c;
     ssize_t n = read(fd, &c, 1);
-    if (n <= 0 || !isdigit(c)) {
-      break;
+
+    if (!isdigit(c)) {
+      incoming_number_idx = 0;
     }
-    buffer[index++] = c;
+    if (c == '-') {
+      incoming_number_idx--;  // secret code for negative
+    }
+    if (isdigit(c)) {
+      if (incoming_number_idx < 0) {
+        incoming_number[0] = '-';
+        incoming_number_idx = 1;
+      }
+      incoming_number[incoming_number_idx++] = c;
+      incoming_number[incoming_number_idx] = 0;
+    }
+    if (c == '\n') {
+      outgoing_number = atoi(incoming_number);
+    }
   }
 
-  return atoi(buffer);
+  int result = outgoing_number;
+  outgoing_number = 0;
+  return result;
 }
 
 SerialMock Serial;

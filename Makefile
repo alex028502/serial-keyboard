@@ -14,15 +14,18 @@ ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
 COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info
 
+BRANCH = --rc lcov_branch_coverage=1
+
 all: lcov clean report ascii-report
 ascii-report: coverage.info
 	lcov --list $<
 	lcov --summary $<
 coverage-check: coverage.info
 	lcov --summary $< | grep lines | grep 100
+	lcov --summary $< | grep branch | grep 100
 report: coverage.info tests.desc
 	rm -rf $@
-	genhtml $< --output-directory $@ --description-file tests.desc --show-details
+	genhtml $< --output-directory $@ --description-file tests.desc --show-details --branch-coverage
 bash-tools:
 	! ./if-else.sh if-else.txt
 tests.desc: coverage.info
@@ -48,21 +51,21 @@ firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	! $(MAKE) assert-clean-coverage
 	cd firmware && luacov -r lcov
 	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > firmware.lua.info
-	lcov --capture --directory . --output-file firmware.c.info
+	lcov $(BRANCH) --capture --directory . --output-file firmware.c.info
 	lcov -a firmware.lua.info -a firmware.c.info -o $@
 ioctl.coverage.info: driver/bytes.cov $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
 	./test/ioctl.sh driver/bytes.cov
 	! $(MAKE) assert-clean-coverage
-	lcov --capture --directory . --output-file $@
+	lcov $(BRANCH) --capture --directory . --output-file $@
 e2e.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
 	$(MAKE) _coverage
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
-	lcov --capture --directory . -o e2e.c.info
+	lcov $(BRANCH) --capture --directory . -o e2e.c.info
 	lcov -a luacov.report.out -a e2e.c.info -o $@
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage

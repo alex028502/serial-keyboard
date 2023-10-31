@@ -96,8 +96,6 @@ check-format: stylua clang-format $(EXE)
 	./list.sh lua | xargs ./if-else.sh
 clang-format stylua luacov lcov:
 	which $@
-test: $(EXE) driver/serial_keyboard_lib.main.so firmware/test/sut.so driver/test/helpers.main.so firmware/baud
-	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) $^
 _coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.cov
 	make $(EXE)
 	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) "$(EXE) -lluacov" $^

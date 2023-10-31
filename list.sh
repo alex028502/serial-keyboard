@@ -6,7 +6,7 @@ if [ "$1" == "" ]
 then
     regex="\."
 else
-    regex="\\.($(echo $@ | sed 's/ /\|/g'))$"
+    regex="(^|/|\\.)($(echo $@ | sed 's/ /\|/g'))$"
 fi
 
 # if it has a space it's not a source file

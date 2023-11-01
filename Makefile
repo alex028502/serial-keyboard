@@ -14,7 +14,7 @@ ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
 COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info
 
-all: lcov report missed-files ascii-report coverage-check
+all: lcov clean report ascii-report
 ascii-report: coverage.info
 	lcov --list $<
 	lcov --summary $<
@@ -29,7 +29,7 @@ tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
 coverage/main: coverage.info  tests.desc
 	rm -rf $@
-coverage.info: clean
+coverage.info: $(ALL_FILES)
 	bashcov ./entry.sh $(COVERAGE_FILES)
 	cat .bashcov/lcov/serial-keyboard.lcov | sed 's|SF:\./|TN:\nSF:$(PWD)/|' > bash.coverage.info
 	$(MAKE) bash.labeled.info

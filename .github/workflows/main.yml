@@ -38,7 +38,7 @@ jobs:
         # run: eval "$(luarocks --lua-version 5.4 path --bin)" && make test-all
       - name: add more info
         shell: bash
-        run: mkdir coverage/debug && cp *.info coverage/debug
+        run: mkdir report/debug && cp *.info coverage/debug
       - name: Upload test coverage
         uses: actions/upload-artifact@v2
         with:

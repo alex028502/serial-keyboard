@@ -3,7 +3,11 @@
 set -e
 
 function wordcount {
-    sed 's/"[^"]*"//g' $2 | sed "s/'[^']*'//g" | sed 's/--.*$//' | grep -o -w $1 | wc -l
+    cat $2 |
+        sed 's/"[^"]*"//g' |
+        sed "s/'[^']*'//g" |
+        sed 's/--.*$//' |
+        grep -o -w $1 | wc -l
 }
 
 echo checking $@

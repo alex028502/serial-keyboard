@@ -1,7 +1,8 @@
 .PHONY: demo always
 
 COV = -fprofile-arcs -ftest-coverage
-COMPILE = gcc -fPIC -c
+# -fno-exceptions https://stackoverflow.com/a/42078101
+COMPILE = gcc -fPIC -c -fno-exceptions
 LUA = lua5.4
 
 headers: always

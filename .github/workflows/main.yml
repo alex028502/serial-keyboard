@@ -41,6 +41,14 @@ jobs:
         with:
           name: coverage
           path: ./report
+      - name: coverage files
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-data
+          path: *.info
+      - name: coverage check
+        shell: bash
+        run: make missed-files coverage-check
       - name: build
         run: GIT_HASH=${{ env.sha_short }} make serial-keyboard.deb
       - name: Upload .deb as artifact

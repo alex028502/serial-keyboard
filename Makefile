@@ -14,7 +14,7 @@ ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
 COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info
 
-all: lcov report missed-files ascii-report coverage-check
+all: lcov report ascii-report
 ascii-report: coverage.info
 	lcov --list $<
 	lcov --summary $<

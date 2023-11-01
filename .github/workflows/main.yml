@@ -36,16 +36,14 @@ jobs:
       - name: test
         run: make
         # run: eval "$(luarocks --lua-version 5.4 path --bin)" && make test-all
+      - name: add more info
+        shell: bash
+        run: mkdir coverage/debug && cp *.info coverage/debug
       - name: Upload test coverage
         uses: actions/upload-artifact@v2
         with:
           name: coverage
           path: ./report
-      - name: coverage files
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-data
-          path: *.info
       - name: coverage check
         shell: bash
         run: make missed-files coverage-check

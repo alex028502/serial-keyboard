@@ -18,11 +18,11 @@ BRANCH = --rc lcov_branch_coverage=1
 
 all: lcov clean report ascii-report
 ascii-report: coverage.info
-	lcov --list $<
-	lcov --summary $<
+	lcov $(BRANCH) --list $<
+	lcov $(BRANCH) --summary $<
 coverage-check: coverage.info
-	lcov --summary $< | grep lines | grep 100
-	lcov --summary $< | grep branch | grep 100
+	lcov $(BRANCH) --summary $< | grep lines | grep 100
+	lcov $(BRANCH) --summary $< | grep branch | grep 100
 report: coverage.info tests.desc
 	rm -rf $@
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details --branch-coverage
@@ -36,7 +36,7 @@ coverage.info: $(ALL_FILES)
 	bashcov ./entry.sh $(COVERAGE_FILES)
 	cat .bashcov/lcov/serial-keyboard.lcov | sed 's|SF:\./|TN:\nSF:$(PWD)/|' > bash.coverage.info
 	$(MAKE) bash.labeled.info
-	echo $(COVERAGE_FILES) bash.labeled.info | xargs -n1 echo -a | xargs lcov -o $@
+	echo $(COVERAGE_FILES) bash.labeled.info | xargs -n1 echo -a | xargs lcov $(BRANCH) -o $@
 missed-files: coverage.info
 	mkdir -p tmp
 	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > tmp/checked-files.txt
@@ -52,7 +52,7 @@ firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	cd firmware && luacov -r lcov
 	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > firmware.lua.info
 	lcov $(BRANCH) --capture --directory . --output-file firmware.c.info
-	lcov -a firmware.lua.info -a firmware.c.info -o $@
+	lcov $(BRANCH) -a firmware.lua.info -a firmware.c.info -o $@
 ioctl.coverage.info: driver/bytes.cov $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
@@ -66,21 +66,21 @@ e2e.coverage.info: $(ALL_FILES)
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
 	lcov $(BRANCH) --capture --directory . -o e2e.c.info
-	lcov -a luacov.report.out -a e2e.c.info -o $@
+	lcov $(BRANCH) -a luacov.report.out -a e2e.c.info -o $@
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
 	./list.sh | xargs -n1 $(EXE) -lluacov newline.lua
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
-	lcov -a luacov.report.out -o $@
+	lcov $(BRANCH) -a luacov.report.out -o $@
 failure.coverage.info: tmp/nonewline.txt $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
 	! $(EXE) -lluacov newline.lua $<
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
-	lcov -a luacov.report.out -o $@
+	lcov $(BRANCH) -a luacov.report.out -o $@
 tmp/nonewline.txt: Makefile
 	mkdir -p $(@D)
 	echo hello > $@

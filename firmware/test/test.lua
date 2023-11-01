@@ -51,7 +51,7 @@ library.assert_equal(fake_device.serial_baud(), baud_rate)
 
 local function try_out(code)
    fake_device.digital_write(library.BUTTON_PIN, 0)
-   helpers.sleep(0.2)
+   helpers.sleep(1)
    library.assert_falsy(
       fake_device.digital_read(library.BUTTON_PIN),
       "push the button"

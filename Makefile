@@ -20,7 +20,8 @@ all: lcov clean report ascii-report
 ascii-report: coverage.info
 	lcov $(BRANCH) --list $<
 	lcov $(BRANCH) --summary $<
-coverage-check: coverage.info
+coverage-check: coverage-100 missed-files
+coverage-100: coverage.info
 	lcov $(BRANCH) --summary $< | grep lines | grep 100
 	lcov $(BRANCH) --summary $< | grep branch | grep 100
 report: coverage.info tests.desc

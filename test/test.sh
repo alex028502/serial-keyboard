@@ -21,7 +21,6 @@ echo using $stty_path
 
 # we could probably just pass in the path to the firmware project but we need
 # to change a few thigs about the make file or start moving to bash from make
-firmware_test_lib=$(dirname $firmware)/lib.sh
 firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
 echo ----------------------- UNIT --------------------------
@@ -34,11 +33,28 @@ echo got $actual_value for $test_code
 [ 1 = "$actual_value" ]
 echo
 echo ----------------------- E2E PREP ----------------------
-source $firmware_test_lib
+dev=./dev
+
+rm -rf $dev
+mkdir $dev
+
+processes=""
+
+function remember {
+    processes="$processes $@"
+}
 
 function cleanup {
-    # wrapper so that we can see in the coverage report that it gets run
-    _cleanup
+    echo
+    echo --------------------- CLEAN UP ------------------------
+    echo background process list
+    echo $processes | xargs -n2 echo
+    ids=$(echo $processes | xargs -n2 echo | awk '{ print $2 }')
+    echo kill $ids
+    kill $ids || echo nothing to clean-up
+    rm -rfv $dev
+    echo -------------------------------------------------------
+    echo
 }
 
 trap cleanup EXIT
@@ -83,7 +99,12 @@ echo ---- TEST E2E -----------
 # the serial path for read and write - and the driver will also want to open
 # for read - so a single path won't work
 mkfifo $dev/serial_connector
-open-serial
+echo ---- OPEN SERIAL --------
+socat -d -d pty,raw,echo=0,link=$dev/serial pty,raw,echo=0,link=$dev/serial.interface &
+remember serial $!
+sleep 1
+echo
+
 # the fifo seems to close better than the socat pty - or I don't know the
 # setting for the socat pty that will make it close nicely like the fifo
 # but maybe if there is a way, somebody will answer someday

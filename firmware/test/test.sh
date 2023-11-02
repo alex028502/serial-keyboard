@@ -6,22 +6,28 @@ interpreter="$1"
 sut=$(realpath $2)
 baud=$(cat $3)
 
-source $(dirname $0)/lib.sh
-
 echo ------------------ FIRMWARE TEST ----------------------
 test_script=$(dirname $0)/test.lua
 test_lib=$(dirname $0)/framework/library.lua
 firmware_test_lib=$(dirname $0)/library.lua
 test_lib="$test_lib $firmware_test_lib"
 
+dev=dev
+rm -rf $dev
+mkdir $dev
+
+echo ---- OPEN SERIAL --------
+socat -d -d pty,raw,echo=0,link=$dev/serial pty,raw,echo=0,link=$dev/serial.interface &
+socat_pid=$!
+sleep 1
+
 function cleanup {
-    # wrapper so that we can see in the coverage report that it gets run
-    _cleanup
+    kill $socat_pid || echo no need to turn off socat
+    rm -rvf $dev
 }
 
 trap cleanup EXIT
 
-open-serial
 echo ---- TEST FIRMWARE ------
 $interpreter $test_script $sut $test_lib $dev/serial $dev/serial.interface $baud
 echo ---- SUCCESS ------------

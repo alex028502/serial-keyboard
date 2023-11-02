@@ -22,6 +22,7 @@ echo using $stty_path
 # we could probably just pass in the path to the firmware project but we need
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lib=$(dirname $firmware)/lib.sh
+firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
 echo ----------------------- UNIT --------------------------
 $interpreter $(dirname $0)/keyevent.lua $library $helper
@@ -103,7 +104,7 @@ echo ---- test driver init ---
 # the serial port should not affect anything here but might need to exist
 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial_connector $baud
 echo ---- test all -----------
-$interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $dev/serial $dev/serial.interface $dev/uinput $baud
+$interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $firmware_test_lua_lib $dev/serial $dev/serial.interface $dev/uinput $baud
 kill -0 $driver_id
 # we didn't save the id in a variable so we can look it up in the process list
 socat_pid=$(echo $processes | xargs -n2 echo | grep -w serial | awk '{ print $2 }')

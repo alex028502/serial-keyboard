@@ -11,6 +11,8 @@ source $(dirname $0)/lib.sh
 echo ------------------ FIRMWARE TEST ----------------------
 test_script=$(dirname $0)/test.lua
 test_lib=$(dirname $0)/framework/library.lua
+firmware_test_lib=$(dirname $0)/library.lua
+test_lib="$test_lib $firmware_test_lib"
 
 function cleanup {
     # wrapper so that we can see in the coverage report that it gets run

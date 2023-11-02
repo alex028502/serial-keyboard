@@ -1,4 +1,4 @@
-local check_path, sut_path, helper_path, library_path, serial_path, serial_interface_path, uinput_interface_path, baud =
+local check_path, sut_path, helper_path, library_path, firmware_lib_path, serial_path, serial_interface_path, uinput_interface_path, baud =
    table.unpack(arg)
 
 print("library path", library_path)
@@ -8,10 +8,11 @@ print("helper path", helper_path)
 library = dofile(library_path)
 
 helpers = library.import(helper_path, "luaopen_helpers")
-library.assert_truthy(library.BUTTON_PIN, "make sure it's loaded")
 fake_device = package.loadlib(sut_path, "luaopen_sut")()
-BUTTON_PIN = library.BUTTON_PIN
-DEFAULT_CODE = library.DEFAULT_CODE
+
+firmware_library = dofile(firmware_lib_path)
+BUTTON_PIN = firmware_library.BUTTON_PIN
+DEFAULT_CODE = firmware_library.DEFAULT_CODE
 
 local uinput_interface = io.open(uinput_interface_path, "rb")
 local serial_interface = io.open(serial_interface_path, "r+")

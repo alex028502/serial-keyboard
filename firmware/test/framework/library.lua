@@ -32,6 +32,4 @@ return {
    assert_falsy = assert_falsy,
    assert_truthy = assert_truthy,
    import = import,
-   BUTTON_PIN = 2,
-   DEFAULT_CODE = 53,
 }

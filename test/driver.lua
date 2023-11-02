@@ -8,7 +8,6 @@ print("helper path", helper_path)
 library = dofile(library_path)
 
 helpers = library.import(helper_path, "luaopen_helpers")
-library.assert_truthy(library.BUTTON_PIN, "make sure it's loaded")
 local check_next = dofile(check_path)(library, helpers)
 
 local uinput_interface = io.open(uinput_interface_path, "rb")

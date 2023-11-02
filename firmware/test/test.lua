@@ -6,15 +6,17 @@ print("cpath: " .. package.cpath)
 -- well not so much the arduino program as the fake framework
 -- I mean the sketch worked right away
 
-local sut_path, library_path, serial_path, serial_interface_path, baud =
+local sut_path, library_path, firmware_lib_path, serial_path, serial_interface_path, baud =
    table.unpack(arg)
 
 library = dofile(library_path)
 print("fake device path", sut_path)
 fake_device = library.import(sut_path, "luaopen_sut")
 
-BUTTON_PIN = library.BUTTON_PIN
-DEFAULT_CODE = library.DEFAULT_CODE
+print("firmware specific testing library", firmware_lib_path)
+firmware_test_lib = dofile(firmware_lib_path)
+BUTTON_PIN = firmware_test_lib.BUTTON_PIN
+DEFAULT_CODE = firmware_test_lib.DEFAULT_CODE
 
 function assert_message(f, code, key)
    local message = f:read("L")

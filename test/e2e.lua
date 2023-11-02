@@ -10,6 +10,8 @@ library = dofile(library_path)
 helpers = library.import(helper_path, "luaopen_helpers")
 library.assert_truthy(library.BUTTON_PIN, "make sure it's loaded")
 fake_device = package.loadlib(sut_path, "luaopen_sut")()
+BUTTON_PIN = library.BUTTON_PIN
+DEFAULT_CODE = library.DEFAULT_CODE
 
 local uinput_interface = io.open(uinput_interface_path, "rb")
 local serial_interface = io.open(serial_interface_path, "r+")
@@ -24,7 +26,7 @@ fake_device.clear_eeprom()
 fake_device.start()
 helpers.sleep(0.5)
 library.assert_truthy(
-   fake_device.digital_read(library.BUTTON_PIN),
+   fake_device.digital_read(BUTTON_PIN),
    "high means button not pressed"
 )
 library.assert_falsy(
@@ -34,23 +36,17 @@ library.assert_falsy(
 
 library.assert_equal(fake_device.serial_baud(), tonumber(baud))
 
-fake_device.digital_write(library.BUTTON_PIN, 0)
-check_next(uinput_interface, library.DEFAULT_CODE, 1)
-library.assert_falsy(
-   fake_device.digital_read(library.BUTTON_PIN),
-   "push the button"
-)
+fake_device.digital_write(BUTTON_PIN, 0)
+check_next(uinput_interface, DEFAULT_CODE, 1)
+library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
 library.assert_truthy(
    fake_device.digital_read(LED_PIN),
    "high led matches low button"
 )
 
-fake_device.digital_write(library.BUTTON_PIN, 1)
-check_next(uinput_interface, library.DEFAULT_CODE, 0)
-library.assert_truthy(
-   fake_device.digital_read(library.BUTTON_PIN),
-   "stop pushing"
-)
+fake_device.digital_write(BUTTON_PIN, 1)
+check_next(uinput_interface, DEFAULT_CODE, 0)
+library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
 library.assert_falsy(
    fake_device.digital_read(LED_PIN),
    "low led matches high button"
@@ -63,23 +59,17 @@ serial:flush()
 serial:close()
 helpers.sleep(0.5)
 
-fake_device.digital_write(library.BUTTON_PIN, 0)
+fake_device.digital_write(BUTTON_PIN, 0)
 check_next(uinput_interface, new_code, 1)
-library.assert_falsy(
-   fake_device.digital_read(library.BUTTON_PIN),
-   "push the button"
-)
+library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
 library.assert_truthy(
    fake_device.digital_read(LED_PIN),
    "high led matches low button"
 )
 
-fake_device.digital_write(library.BUTTON_PIN, 1)
+fake_device.digital_write(BUTTON_PIN, 1)
 check_next(uinput_interface, new_code, 0)
-library.assert_truthy(
-   fake_device.digital_read(library.BUTTON_PIN),
-   "stop pushing"
-)
+library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
 library.assert_falsy(
    fake_device.digital_read(LED_PIN),
    "low led matches high button"

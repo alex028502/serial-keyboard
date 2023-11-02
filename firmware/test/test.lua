@@ -13,13 +13,16 @@ library = dofile(library_path)
 print("fake device path", sut_path)
 fake_device = library.import(sut_path, "luaopen_sut")
 
+BUTTON_PIN = library.BUTTON_PIN
+DEFAULT_CODE = library.DEFAULT_CODE
+
 function assert_message(f, code, key)
    local message = f:read("L")
    library.assert_truthy(message, "something written")
    library.assert_equal(code .. tostring(key) .. "\n", message)
 end
 
-library.assert_truthy(library.BUTTON_PIN, "make sure it's loaded")
+library.assert_truthy(BUTTON_PIN, "make sure it's loaded")
 
 LED_PIN = fake_device.led_builtin()
 print("led pin is " .. LED_PIN)
@@ -35,7 +38,7 @@ library.assert_equal(fake_device.serial_baud(), 0)
 fake_device.start()
 fake_device.sleep(0.2)
 library.assert_truthy(
-   fake_device.digital_read(library.BUTTON_PIN),
+   fake_device.digital_read(BUTTON_PIN),
    "high means button not pressed"
 )
 library.assert_falsy(
@@ -49,24 +52,18 @@ assert(baud_rate > 0, baud)
 library.assert_equal(fake_device.serial_baud(), baud_rate)
 
 local function try_out(code)
-   fake_device.digital_write(library.BUTTON_PIN, 0)
+   fake_device.digital_write(BUTTON_PIN, 0)
    fake_device.sleep(1)
-   library.assert_falsy(
-      fake_device.digital_read(library.BUTTON_PIN),
-      "push the button"
-   )
+   library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
    library.assert_truthy(
       fake_device.digital_read(LED_PIN),
       "high led matches low button"
    )
    assert_message(serial, "D", code)
 
-   fake_device.digital_write(library.BUTTON_PIN, 1)
+   fake_device.digital_write(BUTTON_PIN, 1)
    fake_device.sleep(0.2)
-   library.assert_truthy(
-      fake_device.digital_read(library.BUTTON_PIN),
-      "stop pushing"
-   )
+   library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
    library.assert_falsy(
       fake_device.digital_read(LED_PIN),
       "low led matches high button"
@@ -74,7 +71,7 @@ local function try_out(code)
    assert_message(serial, "U", code)
 end
 
-try_out(library.DEFAULT_CODE)
+try_out(DEFAULT_CODE)
 
 local function set_key(setting)
    serial:write(setting)
@@ -148,7 +145,7 @@ fake_device.sleep(0.3)
 fake_device.start()
 fake_device.sleep(0.2)
 
-try_out(library.DEFAULT_CODE)
+try_out(DEFAULT_CODE)
 
 fake_device.stop()
 fake_device.sleep(0.3)

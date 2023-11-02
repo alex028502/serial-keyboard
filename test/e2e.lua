@@ -11,7 +11,6 @@ helpers = library.import(helper_path, "luaopen_helpers")
 fake_device = package.loadlib(sut_path, "luaopen_sut")()
 
 firmware_library = dofile(firmware_lib_path)
-BUTTON_PIN = firmware_library.BUTTON_PIN
 DEFAULT_CODE = firmware_library.DEFAULT_CODE
 
 local uinput_interface = io.open(uinput_interface_path, "rb")
@@ -20,36 +19,21 @@ local check_next = dofile(check_path)(library, helpers)
 
 print("\nnow the real thing")
 
-LED_PIN = fake_device.led_builtin()
-
 fake_device.serial_init(serial_interface)
 fake_device.clear_eeprom()
 fake_device.start()
 helpers.sleep(0.5)
-library.assert_truthy(
-   fake_device.digital_read(BUTTON_PIN),
-   "high means button not pressed"
-)
-library.assert_falsy(
-   fake_device.digital_read(LED_PIN),
-   "low led matches high button"
-)
+library.assert_falsy(firmware_library.get_led(fake_device))
 
 library.assert_equal(fake_device.serial_baud(), tonumber(baud))
 
-fake_device.digital_write(BUTTON_PIN, 0)
+firmware_library.push_button(fake_device)
 check_next(uinput_interface, DEFAULT_CODE, 1)
-library.assert_truthy(
-   fake_device.digital_read(LED_PIN),
-   "high led matches low button"
-)
+library.assert_truthy(firmware_library.get_led(fake_device))
 
-fake_device.digital_write(BUTTON_PIN, 1)
+firmware_library.release_button(fake_device)
 check_next(uinput_interface, DEFAULT_CODE, 0)
-library.assert_falsy(
-   fake_device.digital_read(LED_PIN),
-   "low led matches high button"
-)
+library.assert_falsy(firmware_library.get_led(fake_device))
 
 local serial = io.open(serial_path, "w")
 local new_code = 77
@@ -58,19 +42,13 @@ serial:flush()
 serial:close()
 helpers.sleep(0.5)
 
-fake_device.digital_write(BUTTON_PIN, 0)
+firmware_library.push_button(fake_device)
 check_next(uinput_interface, new_code, 1)
-library.assert_truthy(
-   fake_device.digital_read(LED_PIN),
-   "high led matches low button"
-)
+library.assert_truthy(firmware_library.get_led(fake_device))
 
-fake_device.digital_write(BUTTON_PIN, 1)
+firmware_library.release_button(fake_device)
 check_next(uinput_interface, new_code, 0)
-library.assert_falsy(
-   fake_device.digital_read(LED_PIN),
-   "low led matches high button"
-)
+library.assert_falsy(firmware_library.get_led(fake_device))
 
 fake_device.stop()
 helpers.sleep(0.5)

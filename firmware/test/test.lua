@@ -12,7 +12,6 @@ fake_device = library.import(sut_path, "luaopen_sut")
 
 print("firmware specific testing library", firmware_lib_path)
 firmware_test_lib = dofile(firmware_lib_path)
-BUTTON_PIN = firmware_test_lib.BUTTON_PIN
 DEFAULT_CODE = firmware_test_lib.DEFAULT_CODE
 
 function assert_message(f, code, key)
@@ -21,7 +20,7 @@ function assert_message(f, code, key)
    library.assert_equal(code .. tostring(key) .. "\n", message)
 end
 
-library.assert_truthy(BUTTON_PIN, "make sure it's loaded")
+library.assert_truthy(DEFAULT_CODE, "make sure it's loaded")
 
 LED_PIN = fake_device.led_builtin()
 print("led pin is " .. LED_PIN)
@@ -37,13 +36,10 @@ library.assert_equal(fake_device.serial_baud(), 0)
 fake_device.start()
 fake_device.sleep(0.2)
 library.assert_truthy(
-   fake_device.digital_read(BUTTON_PIN),
+   fake_device.digital_read(firmware_test_lib.BUTTON_PIN),
    "high means button not pressed"
 )
-library.assert_falsy(
-   fake_device.digital_read(LED_PIN),
-   "low led matches high button"
-)
+library.assert_falsy(firmware_test_lib.get_led(fake_device))
 
 baud_rate = tonumber(baud)
 assert(baud_rate, baud)
@@ -51,30 +47,30 @@ assert(baud_rate > 0, baud)
 library.assert_equal(fake_device.serial_baud(), baud_rate)
 
 local function try_down(code)
-   fake_device.digital_write(BUTTON_PIN, 0)
+   firmware_test_lib.push_button(fake_device)
    fake_device.sleep(1)
-   library.assert_truthy(
-      fake_device.digital_read(LED_PIN),
-      "high led matches low button"
-   )
+   library.assert_truthy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "D", code)
 end
 
 local function try_up(code)
-   fake_device.digital_write(BUTTON_PIN, 1)
+   firmware_test_lib.release_button(fake_device)
    fake_device.sleep(0.2)
-   library.assert_falsy(
-      fake_device.digital_read(LED_PIN),
-      "low led matches high button"
-   )
+   library.assert_falsy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "U", code)
 end
 
 -- try it once one step at a time to test out button read and stuff
 try_down(DEFAULT_CODE)
-library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
+library.assert_falsy(
+   fake_device.digital_read(firmware_test_lib.BUTTON_PIN),
+   "push the button"
+)
 try_up(DEFAULT_CODE)
-library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
+library.assert_truthy(
+   fake_device.digital_read(firmware_test_lib.BUTTON_PIN),
+   "stop pushing"
+)
 
 local function try_out(code)
    try_down(code)

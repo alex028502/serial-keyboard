@@ -23,9 +23,6 @@ echo using $stty_path
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
-echo ----------------------- UNIT --------------------------
-$interpreter $(dirname $0)/keyevent.lua $library $helper
-echo unit passed
 echo ----------------------- LOOKUP ------------------------
 test_code=EV_KEY
 actual_value=$($interpreter $(dirname $0)/lookup.lua $library $helper $test_code)

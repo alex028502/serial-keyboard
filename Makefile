@@ -12,7 +12,7 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info
+COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info meta.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -33,9 +33,11 @@ tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
 coverage/main: coverage.info  tests.desc
 	rm -rf $@
-coverage.info: $(ALL_FILES)
+coverage.info: tmp.coverage.info
+	cat $< | sed 's|SF:/|ABC|' | sed "s|SF:|SF:$(PWD)/|" | sed 's|ABC|SF:/|' > $@
+tmp.coverage.info: $(ALL_FILES)
 	bashcov ./entry.sh $(COVERAGE_FILES)
-	cat .bashcov/lcov/serial-keyboard.lcov | sed 's|SF:\./|TN:\nSF:$(PWD)/|' > bash.coverage.info
+	cat .bashcov/lcov/serial-keyboard.lcov | sed 's|SF:\./|TN:\nSF:|' > bash.coverage.info
 	$(MAKE) bash.labeled.info
 	echo $(COVERAGE_FILES) bash.labeled.info | xargs -n1 echo -a | xargs lcov $(BRANCH) -o $@
 missed-files: coverage.info
@@ -68,6 +70,14 @@ e2e.coverage.info: $(ALL_FILES)
 	luacov -r lcov
 	lcov $(BRANCH) --capture --directory . -o e2e.c.info
 	lcov $(BRANCH) -a luacov.report.out -a e2e.c.info -o $@
+meta.coverage.info: $(ALL_FILES)
+	$(MAKE) clean-coverage
+	$(MAKE) assert-clean-coverage
+	$(EXE) -lluacov test/keyevent.lua $(ASSERTION_LIB) driver/test/helpers.cov.so
+	! $(MAKE) assert-clean-coverage
+	luacov -r lcov
+	lcov $(BRANCH) --capture --directory . --output-file c.$@
+	lcov $(BRANCH) -a luacov.report.out -a c.$@ -o $@
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage

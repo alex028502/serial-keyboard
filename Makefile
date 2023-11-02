@@ -73,11 +73,14 @@ e2e.coverage.info: $(ALL_FILES)
 meta.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
-	$(EXE) -lluacov test/keyevent.lua $(ASSERTION_LIB) driver/test/helpers.cov.so
+	./test/lookup.sh "$(EXE) -lluacov" $(ASSERTION_LIB) driver/test/helpers.cov.so
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
+	mv luacov.report.out lookup.tmp.info
+	$(EXE) -lluacov test/keyevent.lua $(ASSERTION_LIB) driver/test/helpers.cov.so
+	luacov -r lcov
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
-	lcov $(BRANCH) -a luacov.report.out -a c.$@ -o $@
+	lcov $(BRANCH) -a lookup.tmp.info -a luacov.report.out -a c.$@ -o $@
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage

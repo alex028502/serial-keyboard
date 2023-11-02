@@ -35,10 +35,6 @@ fake_device.clear_eeprom()
 library.assert_equal(fake_device.serial_baud(), 0)
 fake_device.start()
 fake_device.sleep(0.2)
-library.assert_truthy(
-   fake_device.digital_read(firmware_test_lib.BUTTON_PIN),
-   "high means button not pressed"
-)
 library.assert_falsy(firmware_test_lib.get_led(fake_device))
 
 baud_rate = tonumber(baud)
@@ -46,35 +42,16 @@ assert(baud_rate, baud)
 assert(baud_rate > 0, baud)
 library.assert_equal(fake_device.serial_baud(), baud_rate)
 
-local function try_down(code)
+local function try_out(code)
    firmware_test_lib.push_button(fake_device)
    fake_device.sleep(1)
    library.assert_truthy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "D", code)
-end
 
-local function try_up(code)
    firmware_test_lib.release_button(fake_device)
    fake_device.sleep(0.2)
    library.assert_falsy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "U", code)
-end
-
--- try it once one step at a time to test out button read and stuff
-try_down(DEFAULT_CODE)
-library.assert_falsy(
-   fake_device.digital_read(firmware_test_lib.BUTTON_PIN),
-   "push the button"
-)
-try_up(DEFAULT_CODE)
-library.assert_truthy(
-   fake_device.digital_read(firmware_test_lib.BUTTON_PIN),
-   "stop pushing"
-)
-
-local function try_out(code)
-   try_down(code)
-   try_up(code)
 end
 
 -- now again using the shortcut

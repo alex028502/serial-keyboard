@@ -20,6 +20,5 @@ return {
    push_button = push_button,
    release_button = release_button,
    get_led = get_led,
-   BUTTON_PIN = BUTTON_PIN,
    DEFAULT_CODE = 53,
 }

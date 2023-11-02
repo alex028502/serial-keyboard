@@ -12,7 +12,6 @@ local sut_path, library_path, serial_path, serial_interface_path, baud =
 library = dofile(library_path)
 print("fake device path", sut_path)
 fake_device = library.import(sut_path, "luaopen_sut")
-helpers = fake_device -- TODO: inline
 
 function assert_message(f, code, key)
    local message = f:read("L")
@@ -51,7 +50,7 @@ library.assert_equal(fake_device.serial_baud(), baud_rate)
 
 local function try_out(code)
    fake_device.digital_write(library.BUTTON_PIN, 0)
-   helpers.sleep(1)
+   fake_device.sleep(1)
    library.assert_falsy(
       fake_device.digital_read(library.BUTTON_PIN),
       "push the button"
@@ -63,7 +62,7 @@ local function try_out(code)
    assert_message(serial, "D", code)
 
    fake_device.digital_write(library.BUTTON_PIN, 1)
-   helpers.sleep(0.2)
+   fake_device.sleep(0.2)
    library.assert_truthy(
       fake_device.digital_read(library.BUTTON_PIN),
       "stop pushing"
@@ -80,7 +79,7 @@ try_out(library.DEFAULT_CODE)
 local function set_key(setting)
    serial:write(setting)
    serial:flush()
-   helpers.sleep(2)
+   fake_device.sleep(2)
 end
 
 local function set_key_and_try_out(setting, new_code)
@@ -131,7 +130,7 @@ saved_value = 99 -- sys rq
 set_key_and_try_out(tostring(saved_value) .. "\n", saved_value)
 
 fake_device.stop()
-helpers.sleep(0.3)
+fake_device.sleep(0.3)
 
 -- now show that it saves in eeprom
 fake_device.start()
@@ -145,13 +144,13 @@ try_out(saved_value)
 -- but between clearing above and restarting now
 -- it will act like it was reflashed
 fake_device.stop()
-helpers.sleep(0.3)
+fake_device.sleep(0.3)
 fake_device.start()
 fake_device.sleep(0.2)
 
 try_out(library.DEFAULT_CODE)
 
 fake_device.stop()
-helpers.sleep(0.3)
+fake_device.sleep(0.3)
 
 print("success")

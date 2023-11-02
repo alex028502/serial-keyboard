@@ -10,17 +10,12 @@ COMPILE = gcc -c -fPIC -I test/framework -include test/framework/Arduino.h -x c+
 
 CC = gcc
 
-coverage: test/sut.cov.so baud.txt $(EXE)
-	test/test.sh "$(EXE) -lluacov" $< baud.txt
-	$(MAKE) -f $(MAKEFILE_LIST) baud-coverage
-baud-coverage: baud.txt baud.cov
-	./baud.cov | diff - $<
+coverage: test/sut.cov.so $(EXE) baud.cov
+	test/test.sh "$(EXE) -lluacov" $< ./baud.cov
 baud.cov: baud.c SerialKeyboard/baud.h
 	gcc -fprofile-arcs -ftest-coverage $< -o $@
 baud: baud.c $(BAUD_FILE) $(MAKEFILE_LIST)
 	$(CC) $< -o $@
-baud.txt: baud
-	./$< > $@
 test/sut%so: test/sketch%o always
 	test/framework/compile.sh "$(MAKE)" $< $@
 test/sketch.cov.o: $(SKETCH)

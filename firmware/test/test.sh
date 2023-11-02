@@ -4,7 +4,7 @@ set -e
 
 interpreter="$1"
 sut=$(realpath $2)
-baud=$(cat $3)
+baud=$($3)
 
 echo ------------------ FIRMWARE TEST ----------------------
 test_script=$(dirname $0)/test.lua

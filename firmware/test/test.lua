@@ -53,19 +53,19 @@ assert(baud_rate, baud)
 assert(baud_rate > 0, baud)
 library.assert_equal(fake_device.serial_baud(), baud_rate)
 
-local function try_out(code)
+local function try_down(code)
    fake_device.digital_write(BUTTON_PIN, 0)
    fake_device.sleep(1)
-   library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
    library.assert_truthy(
       fake_device.digital_read(LED_PIN),
       "high led matches low button"
    )
    assert_message(serial, "D", code)
+end
 
+local function try_up(code)
    fake_device.digital_write(BUTTON_PIN, 1)
    fake_device.sleep(0.2)
-   library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
    library.assert_falsy(
       fake_device.digital_read(LED_PIN),
       "low led matches high button"
@@ -73,6 +73,18 @@ local function try_out(code)
    assert_message(serial, "U", code)
 end
 
+-- try it once one step at a time to test out button read and stuff
+try_down(DEFAULT_CODE)
+library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
+try_up(DEFAULT_CODE)
+library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
+
+local function try_out(code)
+   try_down(code)
+   try_up(code)
+end
+
+-- now again using the shortcut
 try_out(DEFAULT_CODE)
 
 local function set_key(setting)

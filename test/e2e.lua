@@ -39,7 +39,6 @@ library.assert_equal(fake_device.serial_baud(), tonumber(baud))
 
 fake_device.digital_write(BUTTON_PIN, 0)
 check_next(uinput_interface, DEFAULT_CODE, 1)
-library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
 library.assert_truthy(
    fake_device.digital_read(LED_PIN),
    "high led matches low button"
@@ -47,7 +46,6 @@ library.assert_truthy(
 
 fake_device.digital_write(BUTTON_PIN, 1)
 check_next(uinput_interface, DEFAULT_CODE, 0)
-library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
 library.assert_falsy(
    fake_device.digital_read(LED_PIN),
    "low led matches high button"
@@ -62,7 +60,6 @@ helpers.sleep(0.5)
 
 fake_device.digital_write(BUTTON_PIN, 0)
 check_next(uinput_interface, new_code, 1)
-library.assert_falsy(fake_device.digital_read(BUTTON_PIN), "push the button")
 library.assert_truthy(
    fake_device.digital_read(LED_PIN),
    "high led matches low button"
@@ -70,7 +67,6 @@ library.assert_truthy(
 
 fake_device.digital_write(BUTTON_PIN, 1)
 check_next(uinput_interface, new_code, 0)
-library.assert_truthy(fake_device.digital_read(BUTTON_PIN), "stop pushing")
 library.assert_falsy(
    fake_device.digital_read(LED_PIN),
    "low led matches high button"

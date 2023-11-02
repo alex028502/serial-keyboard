@@ -1,6 +1,3 @@
-print("path: " .. package.path)
-print("cpath: " .. package.cpath)
-
 -- it was too hard to get everything working at once
 -- so I needed to test the arduino program on its own first
 -- well not so much the arduino program as the fake framework

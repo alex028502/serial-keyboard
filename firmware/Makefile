@@ -6,20 +6,18 @@ EXE = lua5.4
 
 FRAMEWORK = test/framework
 
-COMPILE = gcc -c -fPIC -I test/framework -include test/framework/Arduino.h -x c++
-
 CC = gcc
+CFLAGS =
+LDFLAGS =
 
-coverage: test/sut.cov.so baud.cov
-	test/test.sh $(EXE) $< ./baud.cov
-baud.cov: baud.c SerialKeyboard/baud.h
-	gcc -fprofile-arcs -ftest-coverage $< -o $@
+test: test/sut.so baud
+	test/test.sh $(EXE) $< ./baud
 baud: baud.c $(BAUD_FILE) $(MAKEFILE_LIST)
-	$(CC) $< -o $@
-test/sut%so: test/sketch%o always
-	test/framework/compile.sh "$(MAKE)" $< $@
-test/sketch.cov.o: $(SKETCH)
-	$(COMPILE) -fprofile-arcs -ftest-coverage $< -o $@
+	$(CC) $< -o $@ $(CFLAGS)
+test/sut.so: test/sketch.o always
+	test/framework/compile.sh "$(MAKE)" $< $@ $(CC) "$(LDFLAGS)" "$(CFLAGS)"
+test/sketch.o: $(SKETCH)
+	$(CC) -c -fPIC -I test/framework -include test/framework/Arduino.h -x c++ $(CFLAGS) $< -o $@
 always:
 clean:
 	find test -name '*.so' -o -name '*.o' -o -name '*.gc*' | xargs rm -f

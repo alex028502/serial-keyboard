@@ -47,7 +47,7 @@ missed-files: coverage.info
 	sed "s|TN:|TN:$*|" $< > $@
 firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	$(MAKE) clean-coverage
-	./with-lua.sh - $(MAKE) -C firmware coverage
+	./with-lua.sh - $(MAKE) -C firmware test CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
 	cd firmware && luacov -r lcov
 	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > lua.$@
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
@@ -103,14 +103,14 @@ check-format: stylua clang-format
 	! grep -nHw g'++' $(ALL_FILES)
 clang-format stylua luacov lcov:
 	which $@
-_coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.cov
+_coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.so driver/test/helpers.cov.so firmware/baud
 	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) $^
 driver/%.so: always
 	$(MAKE) -C driver $*.so
 driver/bytes.cov:
 	make -C $(@D) $(@F)
 firmware/%.so: always
-	$(MAKE) -C firmware $*.so
+	$(MAKE) -C firmware $*.so CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
 always:
 serial-keyboard.deb: package
 	dpkg-deb --build $< $@

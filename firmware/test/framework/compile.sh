@@ -11,16 +11,16 @@ dir=$(dirname $0)
 MAKE="$1 -C $dir"
 sut_obj_file=$2
 so=$3
+CC=$4
+LDFLAGS=$5
+CFLAGS=$6
 
 # modules="$dir/serial.cpp $dir/framework.c $dir/eeprom.c $dir/gpio.c"
 l="-lpthread"
 
-l="$l -lgcov"
-# if/when this is an external framework, I am not sure if the following is
-# necessary or advisable, since the users of the framework will not be
-# interested in the coverage of the framework from their tests
-# but it might not hurt
-ext=".cov.o"
+l="$l $LDFLAGS"
+
+ext=".o"
 
 module_names=""
 module_paths=""
@@ -30,6 +30,6 @@ do
     module_paths="$module_paths $dir/$f$ext"
 done
 
-$MAKE $module_names
+$MAKE $module_names CC=$CC COV="$CFLAGS"
 
-exec gcc -shared -fPIC $module_paths $sut_obj_file $l -o $so
+exec $CC -shared -fPIC $module_paths $sut_obj_file $l -o $so

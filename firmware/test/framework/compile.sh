@@ -36,4 +36,4 @@ done
 
 $MAKE $module_names
 
-exec g++ -shared -fPIC $module_paths $sut_obj_file $l -o $so
+exec gcc -shared -fPIC $module_paths $sut_obj_file $l -o $so

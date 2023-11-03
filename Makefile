@@ -100,6 +100,7 @@ check-format: stylua clang-format
 	! ./list.sh | grep -v Makefile | grep -vw mk | xargs grep -nHP '\t'
 	./list.sh | xargs -n1 lua5.4 newline.lua
 	./list.sh lua | xargs ./if-else.sh
+	! grep -nHw g'++' $(ALL_FILES)
 clang-format stylua luacov lcov:
 	which $@
 _coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.cov

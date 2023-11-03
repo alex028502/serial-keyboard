@@ -12,12 +12,8 @@ MAKE="$1 -C $dir"
 sut_obj_file=$2
 so=$3
 
-$MAKE version.txt
-
-LUA=$(cat $dir/version.txt)
-
 # modules="$dir/serial.cpp $dir/framework.c $dir/eeprom.c $dir/gpio.c"
-l="-lpthread -l$LUA"
+l="-lpthread"
 
 l="$l -lgcov"
 # if/when this is an external framework, I am not sure if the following is

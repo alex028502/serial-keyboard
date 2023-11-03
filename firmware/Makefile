@@ -21,8 +21,6 @@ test/sut%so: test/sketch%o always
 test/sketch.cov.o: $(SKETCH)
 	$(COMPILE) -fprofile-arcs -ftest-coverage $< -o $@
 always:
-test/framework/%: always
-	$(MAKE) -C $(@D) $(@F)
 clean:
 	find test -name '*.so' -o -name '*.o' -o -name '*.gc*' | xargs rm -f
 	find test -name 'luacov.*.out' | xargs rm -f

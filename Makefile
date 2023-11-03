@@ -49,7 +49,6 @@ missed-files: coverage.info
 	sed "s|TN:|TN:$*|" $< > $@
 firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	$(MAKE) clean-coverage
-	$(MAKE) assert-clean-coverage
 	$(MAKE) -C firmware coverage
 	! $(MAKE) assert-clean-coverage
 	cd firmware && luacov -r lcov
@@ -58,13 +57,11 @@ firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	lcov $(BRANCH) -a firmware.lua.info -a firmware.c.info -o $@
 ioctl.coverage.info: driver/bytes.cov $(ALL_FILES)
 	$(MAKE) clean-coverage
-	$(MAKE) assert-clean-coverage
 	./test/ioctl.sh driver/bytes.cov
 	! $(MAKE) assert-clean-coverage
 	lcov $(BRANCH) --capture --directory . --output-file $@
 e2e.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	$(MAKE) assert-clean-coverage
 	$(MAKE) _coverage
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
@@ -72,7 +69,6 @@ e2e.coverage.info: $(ALL_FILES)
 	lcov $(BRANCH) -a luacov.report.out -a e2e.c.info -o $@
 meta.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	$(MAKE) assert-clean-coverage
 	./test/lookup.sh "$(EXE) -lluacov" $(ASSERTION_LIB) driver/test/helpers.cov.so
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
@@ -83,14 +79,12 @@ meta.coverage.info: $(ALL_FILES)
 	lcov $(BRANCH) -a lookup.tmp.info -a luacov.report.out -a c.$@ -o $@
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	$(MAKE) assert-clean-coverage
 	./list.sh | xargs -n1 $(EXE) -lluacov newline.lua
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
 	lcov $(BRANCH) -a luacov.report.out -o $@
 failure.coverage.info: tmp/nonewline.txt $(ALL_FILES)
 	$(MAKE) clean-coverage
-	$(MAKE) assert-clean-coverage
 	! $(EXE) -lluacov newline.lua $<
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
@@ -102,6 +96,7 @@ tmp/nonewline.txt: Makefile
 clean-coverage:
 	find . -name $(C_COVERAGE_PATTERN) | xargs rm -vf
 	find . -name $(LUA_COVERAGE_PATTERN) | xargs rm -vf
+	$(MAKE) assert-clean-coverage
 assert-clean-coverage:
 	! find . -name $(C_COVERAGE_PATTERN) | grep '.'
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'

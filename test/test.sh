@@ -6,8 +6,8 @@ driver_script=$(realpath $1)
 shift
 library=$(realpath $1)
 shift
-interpreter="$1"
-shift
+interpreter=lua5.4
+
 driver_lib=$(realpath $1)
 shift
 firmware=$(realpath $1)

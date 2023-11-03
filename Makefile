@@ -65,7 +65,7 @@ e2e.coverage.info: $(ALL_FILES)
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 meta.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./with-lua.sh - ./test/lookup.sh lua5.4 $(ASSERTION_LIB) driver/test/helpers.cov.so
+	./with-lua.sh - ./test/lookup.sh $(ASSERTION_LIB) driver/test/helpers.cov.so
 	./with-lua.sh - lua5.4 test/keyevent.lua $(ASSERTION_LIB) driver/test/helpers.cov.so
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
 	luacov -r lcov
@@ -103,7 +103,7 @@ check-format: stylua clang-format
 clang-format stylua luacov lcov:
 	which $@
 _coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.cov
-	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) lua5.4 $^
+	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) $^
 driver/%.so: always
 	$(MAKE) -C driver $*.so
 driver/bytes.cov:

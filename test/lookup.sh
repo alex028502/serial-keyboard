@@ -2,8 +2,7 @@
 
 set -e
 
-interpreter=$1
-shift
+interpreter=lua5.4
 
 test_code=EV_KEY
 actual_value=$($interpreter $(dirname $0)/lookup.lua $@ $test_code)

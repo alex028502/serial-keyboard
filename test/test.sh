@@ -3,14 +3,20 @@
 set -e
 
 driver_script=$(realpath $1)
-library=$(realpath $2)
-interpreter="$3"
-driver_lib=$(realpath $4)
-firmware=$(realpath $5)
-helper=$(realpath $6)
+shift
+library=$(realpath $1)
+shift
+interpreter="$1"
+shift
+driver_lib=$(realpath $1)
+shift
+firmware=$(realpath $1)
+shift
+helper=$(realpath $1)
+shift
 # TODO: I don't really know what is getting compared to what with baud anymore
 # need to clean it up soon
-baud_program=$(realpath $7)
+baud_program=$(realpath $1)
 baud=$($baud_program)
 
 # so that it uses fake stty

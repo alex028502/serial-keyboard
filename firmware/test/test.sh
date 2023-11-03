@@ -3,8 +3,10 @@
 set -e
 
 interpreter="$1"
-sut=$(realpath $2)
-baud=$($3)
+shift
+sut=$(realpath $1)
+shift
+baud=$($1)
 
 echo ------------------ FIRMWARE TEST ----------------------
 test_script=$(dirname $0)/test.lua

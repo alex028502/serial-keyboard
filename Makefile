@@ -31,7 +31,7 @@ bash-tools:
 	! ./if-else.sh if-else.txt
 tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
-coverage/main: coverage.info  tests.desc
+coverage/main: coverage.info tests.desc
 	rm -rf $@
 coverage.info: tmp.coverage.info
 	cat $< | sed 's|SF:/|ABC|' | sed "s|SF:|SF:$(PWD)/|" | sed 's|ABC|SF:/|' > $@

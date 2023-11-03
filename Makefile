@@ -2,8 +2,6 @@
 
 GIT_HASH := dev
 
-# the two projects will use the same exe so either will do
-EXE = firmware/test/framework/lua
 ASSERTION_LIB = firmware/test/framework/library.lua
 
 C_COVERAGE_PATTERN = '*.gcda'
@@ -43,18 +41,17 @@ tmp.coverage.info: $(ALL_FILES)
 missed-files: coverage.info
 	mkdir -p tmp
 	cat $^ | grep SF | cut -c4- | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort | uniq > tmp/checked-files.txt
-	./list.sh lua c cpp ino sh stty | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > tmp/all-files.txt
+	./list.sh lua c cpp ino sh stty 4 | xargs -I {} realpath --relative-to="$(PWD)" "{}" | sort > tmp/all-files.txt
 	diff tmp/all-files.txt tmp/checked-files.txt
 %.labeled.info: %.coverage.info
 	sed "s|TN:|TN:$*|" $< > $@
 firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	$(MAKE) clean-coverage
-	$(MAKE) -C firmware coverage
-	! $(MAKE) assert-clean-coverage
+	./with-lua.sh - $(MAKE) -C firmware coverage
 	cd firmware && luacov -r lcov
-	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > firmware.lua.info
-	lcov $(BRANCH) --capture --directory . --output-file firmware.c.info
-	lcov $(BRANCH) -a firmware.lua.info -a firmware.c.info -o $@
+	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > lua.$@
+	lcov $(BRANCH) --capture --directory . --output-file c.$@
+	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 ioctl.coverage.info: driver/bytes.cov $(ALL_FILES)
 	$(MAKE) clean-coverage
 	./test/ioctl.sh driver/bytes.cov
@@ -62,33 +59,28 @@ ioctl.coverage.info: driver/bytes.cov $(ALL_FILES)
 	lcov $(BRANCH) --capture --directory . --output-file $@
 e2e.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	$(MAKE) _coverage
+	./with-lua.sh lua.$@ $(MAKE) _coverage
 	! $(MAKE) assert-clean-coverage
-	luacov -r lcov
-	lcov $(BRANCH) --capture --directory . -o e2e.c.info
-	lcov $(BRANCH) -a luacov.report.out -a e2e.c.info -o $@
+	lcov $(BRANCH) --capture --directory . -o c.$@
+	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 meta.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./test/lookup.sh "$(EXE) -lluacov" $(ASSERTION_LIB) driver/test/helpers.cov.so
-	! $(MAKE) assert-clean-coverage
-	luacov -r lcov
-	mv luacov.report.out lookup.tmp.info
-	$(EXE) -lluacov test/keyevent.lua $(ASSERTION_LIB) driver/test/helpers.cov.so
-	luacov -r lcov
+	./with-lua.sh - ./test/lookup.sh lua5.4 $(ASSERTION_LIB) driver/test/helpers.cov.so
+	./with-lua.sh - lua5.4 test/keyevent.lua $(ASSERTION_LIB) driver/test/helpers.cov.so
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
-	lcov $(BRANCH) -a lookup.tmp.info -a luacov.report.out -a c.$@ -o $@
+	luacov -r lcov
+	lcov $(BRANCH) -a luacov.report.out -a c.$@ -o $@
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./list.sh | xargs -n1 $(EXE) -lluacov newline.lua
+	$(MAKE) assert-clean-coverage
+	./with-lua.sh $@ lua5.4 newline.lua Makefile
 	! $(MAKE) assert-clean-coverage
-	luacov -r lcov
-	lcov $(BRANCH) -a luacov.report.out -o $@
 failure.coverage.info: tmp/nonewline.txt $(ALL_FILES)
 	$(MAKE) clean-coverage
-	! $(EXE) -lluacov newline.lua $<
+	! ./with-lua.sh - lua5.4 newline.lua $<
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
-	lcov $(BRANCH) -a luacov.report.out -o $@
+	mv luacov.report.out $@
 tmp/nonewline.txt: Makefile
 	mkdir -p $(@D)
 	echo hello > $@
@@ -100,22 +92,21 @@ clean-coverage:
 assert-clean-coverage:
 	! find . -name $(C_COVERAGE_PATTERN) | grep '.'
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'
-check-format: stylua clang-format $(EXE)
+check-format: stylua clang-format
 	! ./list.sh | sed 's/ /SPACE/' | grep SPACE # no spaces in paths
 	./list.sh c cpp h ino | xargs clang-format --style=Chromium -Werror --dry-run
 	./list.sh lua | xargs $< --check
 	! ./list.sh | xargs grep -rnH '.*\s$$'
 	! ./list.sh | grep -v Makefile | grep -vw mk | xargs grep -nHP '\t'
-	./list.sh | xargs -n1 $(EXE) newline.lua
+	./list.sh | xargs -n1 lua5.4 newline.lua
 	./list.sh lua | xargs ./if-else.sh
 clang-format stylua luacov lcov:
 	which $@
 _coverage: driver/serial_keyboard_lib.cov.so firmware/test/sut.cov.so driver/test/helpers.cov.so firmware/baud.cov
-	make $(EXE)
-	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) "$(EXE) -lluacov" $^
+	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) lua5.4 $^
 driver/%.so: always
 	$(MAKE) -C driver $*.so
-driver/bytes.cov $(EXE):
+driver/bytes.cov:
 	make -C $(@D) $(@F)
 firmware/%.so: always
 	$(MAKE) -C firmware $*.so

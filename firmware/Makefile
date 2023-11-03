@@ -2,7 +2,7 @@
 
 SKETCH = SerialKeyboard/SerialKeyboard.ino
 
-EXE = test/framework/lua
+EXE = lua5.4
 
 FRAMEWORK = test/framework
 
@@ -10,8 +10,8 @@ COMPILE = gcc -c -fPIC -I test/framework -include test/framework/Arduino.h -x c+
 
 CC = gcc
 
-coverage: test/sut.cov.so $(EXE) baud.cov
-	test/test.sh "$(EXE) -lluacov" $< ./baud.cov
+coverage: test/sut.cov.so baud.cov
+	test/test.sh $(EXE) $< ./baud.cov
 baud.cov: baud.c SerialKeyboard/baud.h
 	gcc -fprofile-arcs -ftest-coverage $< -o $@
 baud: baud.c $(BAUD_FILE) $(MAKEFILE_LIST)

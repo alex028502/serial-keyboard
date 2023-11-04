@@ -4,7 +4,7 @@ GIT_HASH := dev
 
 serial-keyboard.deb: package
 	dpkg-deb --build $< $@
-package: always
+package:
 	rm -rf $@
 	mkdir -p $@/etc/udev/rules.d $@/etc/serial-keyboard
 	mkdir -p $@/DEBIAN $@/etc/systemd/system
@@ -17,9 +17,9 @@ package: always
 	$(MAKE) -f $(MAKEFILE_LIST) $@/DEBIAN/control
 package/DEBIAN/control: resources/control
 	sed "s/{ VERSION }/$(shell date +"%Y%m%d%H%M%S").$(GIT_HASH)/" $< > $@
-package/usr/share/serial-keyboard: firmware/baud driver/serial_keyboard.lua driver/serial_keyboard_lib.so
+package/usr/share/serial-keyboard: baud serial_keyboard.lua serial_keyboard_lib.main.so
 	mkdir -p $@
 	cp $^ $@
-firmware/% driver/%: always
+baud serial_keyboard_lib.main.so: always
 	$(MAKE) $@
 always:

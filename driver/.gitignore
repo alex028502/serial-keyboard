@@ -1,4 +1,6 @@
 
 lua*
 /*.so
-/bytes.cov
+/bytes*
+/package
+/version.txt

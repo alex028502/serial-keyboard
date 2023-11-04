@@ -29,10 +29,6 @@ jobs:
         run: |
           wget -O /tmp/stylua.zip https://github.com/JohnnyMorganz/StyLua/releases/download/v0.18.2/stylua-linux-x86_64.zip
           sudo unzip /tmp/stylua.zip -d /usr/local/bin/
-      - name: Get Short Git Hash
-        shell: bash
-        run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
-        # thanks https://stackoverflow.com/a/61699863
       - name: test
         run: make
         # run: eval "$(luarocks --lua-version 5.4 path --bin)" && make test-all
@@ -47,13 +43,25 @@ jobs:
       - name: coverage check
         shell: bash
         run: make coverage-check
+  build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get Short Git Hash
+        shell: bash
+        run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+        # thanks https://stackoverflow.com/a/61699863
+      - name: apt deps
+        shell: bash
+        run: sudo apt-get install liblua5.4-dev lua5.4
       - name: build
-        run: GIT_HASH=${{ env.sha_short }} make -f package.mk serial-keyboard.deb
+        run: GIT_HASH=${{ env.sha_short }} make -C driver -f package.mk serial-keyboard.deb
       - name: Upload .deb as artifact
         uses: actions/upload-artifact@v2
         with:
           name: serial-keyboard-${{ env.sha_short }}.deb
-          path: ./serial-keyboard.deb
+          path: ./driver/serial-keyboard.deb
   firmware-job:
     runs-on: ubuntu-latest
     strategy:

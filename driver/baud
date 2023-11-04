@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+
+set -e
+
+# this is temporary to work with the old api
+
+echo 115200

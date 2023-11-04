@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: make coverage-check
       - name: build
-        run: GIT_HASH=${{ env.sha_short }} make serial-keyboard.deb
+        run: GIT_HASH=${{ env.sha_short }} make -f package.mk serial-keyboard.deb
       - name: Upload .deb as artifact
         uses: actions/upload-artifact@v2
         with:

@@ -5,7 +5,7 @@ end
 
 local function assert_in(a, b, message)
    m = "assert_in"
-   assert(string.find(b, a) ~= nil, m .. ": " .. a .. " not in\n" .. b)
+   assert(string.find(b, a, 0, true) ~= nil, m .. ": " .. a .. " not in\n" .. b)
 end
 
 local function is_falsy(a)

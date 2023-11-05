@@ -30,7 +30,7 @@ echo using $stty_path
 firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
 echo ----------------------- E2E PREP ----------------------
-dev=./dev
+dev=$PWD/dev
 
 rm -rf $dev
 mkdir $dev

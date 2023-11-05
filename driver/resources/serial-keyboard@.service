@@ -2,7 +2,7 @@
 Description=Serial Keyboard Driver
 
 [Service]
-ExecStart=lua5.4 INST/serial_keyboard.lua INST/serial_keyboard_lib.main.so /dev/%i /dev/uinput INST/baud
+ExecStart=INST/start.sh INST/serial_keyboard_lib.main.so /dev/%i /dev/uinput
 
 [Install]
 WantedBy=multi-user.target

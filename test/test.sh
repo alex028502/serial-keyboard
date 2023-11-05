@@ -29,6 +29,9 @@ echo using $stty_path
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
+# clean that up later
+driver_script=$(dirname $driver_script)/start.sh
+
 echo ----------------------- E2E PREP ----------------------
 dev=$PWD/dev
 
@@ -67,7 +70,7 @@ echo
 echo ---- TEST DRIVER --------
 mkfifo $dev/serial
 echo ---- start driver -------
-SERIAL_KEYBOARD_DEBUG=TRUE $interpreter $driver_script $driver_lib $dev/serial $dev/uinput $baud_program &
+SERIAL_KEYBOARD_DEBUG=TRUE $driver_script $driver_lib $dev/serial $dev/uinput &
 driver_id=$!
 remember driver $driver_id
 sleep 1
@@ -113,7 +116,7 @@ remember cat $cat_pid
 sleep .1
 kill -0 $cat_pid
 echo ---- start driver -------
-$interpreter $driver_script $driver_lib $dev/serial_connector $dev/uinput $baud_program &
+$driver_script $driver_lib $dev/serial_connector $dev/uinput &
 driver_id=$!
 remember driver2 $driver_id
 echo see if it started:
@@ -143,7 +146,7 @@ function test-error {
     cat < $dev/serial > /dev/null &
     remember $1-cat-2 $!
     set +e
-    timeout 1.2 $interpreter $driver_script $driver_lib $dev/serial $dev/uinput $baud_program
+    timeout 1.2 $driver_script $driver_lib $dev/serial $dev/uinput
     stat=$?
     set -e
     sign=$2

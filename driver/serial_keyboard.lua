@@ -1,15 +1,6 @@
 local lib_path = arg[1]
 local input_device_path = arg[2]
 local uinput_device_path = arg[3]
-local baud_program_path = arg[4]
-
-local baud_handle = io.popen(baud_program_path)
-local baud_result = baud_handle:read("*a")
-baud_handle:close()
-
-local stty_status =
-   os.execute("stty -echo -F " .. input_device_path .. " " .. baud_result)
-assert(stty_status)
 
 local lib_table, lib_error =
    package.loadlib(lib_path, "luaopen_serial_keyboard_lib")

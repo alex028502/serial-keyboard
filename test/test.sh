@@ -61,12 +61,7 @@ trap cleanup EXIT
 echo ---- OPEN FAKE UINPUT ---
 mkfifo $dev/uinput
 echo
-echo ---- COVERAGE OPTIONS ---
-# this one has one more option when in coverage mode
-echo using interpreter $i from $interpreter
-echo \(in cases where program does not end cleanly\)
 
-echo
 echo ---- TEST DRIVER --------
 mkfifo $dev/serial
 echo ---- start driver -------

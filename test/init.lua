@@ -52,10 +52,23 @@ for i = constants.KEY_ESC, constants.KEY_MICMUTE do
 end
 
 local ui_dev_create = uinput_interface:read("*L")
-library.assert_in("[DATA]", ui_dev_create)
--- would be cool to look up the pointer that is passed in
--- and assert the data structure inside
 library.assert_in(constants.UI_DEV_SETUP, ui_dev_create)
+local size_of_structure = helpers.parse_uinput_user_dev()
+local uinput_user_dev_message = uinput_interface:read(size_of_structure)
+
+-- check the handing of this error
+library.assert_in("Mismatch", helpers.parse_uinput_user_dev("test"))
+
+local uinput_user_dev = helpers.parse_uinput_user_dev(uinput_user_dev_message)
+
+-- pretty much copied the answers from the implementation
+-- mainly just shows that it is sending a valid structure
+library.assert_equal(uinput_user_dev.name, "Example device")
+library.assert_equal(uinput_user_dev.vendor, 0x1234)
+library.assert_equal(uinput_user_dev.version, 4)
+library.assert_equal(uinput_user_dev.bustype, 3)
+library.assert_equal(uinput_user_dev.product, 0x5678)
+
 assert_ioctl(uinput_interface, constants.UI_DEV_CREATE)
 
 print("\ndriver initialization checks")

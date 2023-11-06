@@ -5,6 +5,50 @@
 #include <string.h>
 #include <unistd.h>
 
+static int l_parse_uinput_user_dev(lua_State* L) {
+  int n = sizeof(struct uinput_user_dev);
+
+  if (!lua_gettop(L)) {
+    lua_pushinteger(L, n);
+    return 1;
+  }
+
+  size_t len;
+  const char* str = luaL_checklstring(L, 1, &len);
+
+  if (len != n) {
+    lua_pushstring(L, "Size Mismatch");
+    return 1;
+  }
+
+  struct uinput_user_dev uinp;
+  memcpy(&uinp, str, len);
+
+  lua_newtable(L);
+
+  lua_pushstring(L, "name");
+  lua_pushstring(L, uinp.name);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "vendor");
+  lua_pushinteger(L, uinp.id.vendor);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "product");
+  lua_pushinteger(L, uinp.id.product);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "version");
+  lua_pushinteger(L, uinp.id.version);
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "bustype");
+  lua_pushinteger(L, uinp.id.bustype);
+  lua_settable(L, -3);
+
+  return 1;
+}
+
 static int l_read_key_event(lua_State* L) {
   size_t len;
   const char* data = luaL_checklstring(L, 1, &len);
@@ -79,11 +123,13 @@ static int l_get_constants(lua_State* L) {
   return 1;
 }
 
-static const luaL_Reg helperlib[] = {{"read_key_event", l_read_key_event},
-                                     {"get_constants", l_get_constants},
-                                     {"sleep", l_sleep},
-                                     {"event_size", l_event_size},
-                                     {NULL, NULL}};
+static const luaL_Reg helperlib[] = {
+    {"read_key_event", l_read_key_event},
+    {"parse_uinput_user_dev", l_parse_uinput_user_dev},
+    {"get_constants", l_get_constants},
+    {"sleep", l_sleep},
+    {"event_size", l_event_size},
+    {NULL, NULL}};
 
 int luaopen_helpers(lua_State* L) {
   luaL_newlib(L, helperlib);

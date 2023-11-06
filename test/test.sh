@@ -78,7 +78,7 @@ echo see if it started:
 kill -0 $driver_id
 echo ---- test driver init ---
 # the serial port should not affect anything here but might need to exist
-$interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial $baud
+timeout 10 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial $baud
 echo ---- test driver --------
 $interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud
 echo ---- clean up ------------

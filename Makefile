@@ -8,7 +8,8 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-COVERAGE_FILES = firmware.labeled.info e2e.labeled.info tools.labeled.info failure.labeled.info ioctl.labeled.info meta.labeled.info
+STD_FORMAT = test-e2e.labeled.info test-driver.labeled.info test-error.labeled.info
+COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) tools.labeled.info failure.labeled.info ioctl.labeled.info meta.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -57,9 +58,9 @@ ioctl.coverage.info: driver/bytes $(ALL_FILES)
 	./test/ioctl.sh driver/bytes
 	! $(MAKE) assert-clean-coverage
 	lcov $(BRANCH) --capture --directory . --output-file $@
-e2e.coverage.info: $(ALL_FILES)
+test-%.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./with-lua.sh lua.$@ $(MAKE) _coverage
+	./with-lua.sh lua.$@ $(MAKE) test-$*
 	! $(MAKE) assert-clean-coverage
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
@@ -108,7 +109,6 @@ baud-check: tmp/firmware-baud.txt tmp/driver-baud.txt
 tmp/%-baud.txt: %/baud
 	mkdir -p $(@D)
 	$< > $@
-_coverage: test-driver test-error test-e2e
 test-driver: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so firmware/baud
 	test/driver.sh driver/start.sh $(ASSERTION_LIB) $^
 test-error: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so

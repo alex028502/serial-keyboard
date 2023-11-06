@@ -104,11 +104,8 @@ check-format: stylua clang-format
 	! grep -nHw g'++' $(ALL_FILES)
 clang-format stylua luacov lcov:
 	which $@
-baud-check: tmp/firmware-baud.txt driver/baud.txt
-	diff $^
-tmp/%-baud.txt: %/baud
-	mkdir -p $(@D)
-	$< > $@
+baud-check: firmware/baud driver/baud.txt
+	$< | diff - driver/baud.txt
 test-driver: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	test/driver.sh driver/start.sh $(ASSERTION_LIB) $^
 test-error: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so

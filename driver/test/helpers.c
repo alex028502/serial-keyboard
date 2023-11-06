@@ -54,7 +54,8 @@ static int l_read_key_event(lua_State* L) {
   const char* data = luaL_checklstring(L, 1, &len);
 
   if (len != sizeof(struct input_event)) {
-    return luaL_error(L, "Size Mismatch");
+    lua_pushstring(L, "Size Mismatch");
+    return 1;
   }
 
   struct input_event* ev = (struct input_event*)data;

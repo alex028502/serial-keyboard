@@ -66,7 +66,7 @@ e2e.coverage.info: $(ALL_FILES)
 meta.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	./with-lua.sh - ./test/lookup.sh $(ASSERTION_LIB) driver/test/helpers.so
-	./with-lua.sh - lua5.4 test/keyevent.lua $(ASSERTION_LIB) driver/test/helpers.so
+	./with-lua.sh - lua5.4 test/meta.lua $(ASSERTION_LIB) driver/test/helpers.so
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
 	luacov -r lcov
 	lcov $(BRANCH) -a luacov.report.out -a c.$@ -o $@

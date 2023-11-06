@@ -19,3 +19,4 @@ library.assert_falsy(try_read_key_event(test_string(-1)), "too small")
 library.assert_falsy(try_read_key_event(test_string(1)), "too big")
 
 library.assert_in("Mismatch", helpers.read_key_event(test_string(2)))
+library.assert_in("Mismatch", helpers.parse_uinput_user_dev("test"))

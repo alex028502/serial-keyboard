@@ -56,9 +56,6 @@ library.assert_in(constants.UI_DEV_SETUP, ui_dev_create)
 local size_of_structure = helpers.parse_uinput_user_dev()
 local uinput_user_dev_message = uinput_interface:read(size_of_structure)
 
--- check the handing of this error
-library.assert_in("Mismatch", helpers.parse_uinput_user_dev("test"))
-
 local uinput_user_dev = helpers.parse_uinput_user_dev(uinput_user_dev_message)
 
 -- pretty much copied the answers from the implementation

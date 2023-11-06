@@ -20,6 +20,6 @@ package/DEBIAN/control: resources/control
 package/usr/share/serial-keyboard: baud serial_keyboard.lua serial_keyboard_lib.main.so start.sh
 	mkdir -p $@
 	cp $^ $@
-baud serial_keyboard_lib.main.so: always
+serial_keyboard_lib.main.so: always
 	$(MAKE) $@
 always:

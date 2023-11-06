@@ -109,7 +109,7 @@ tmp/%-baud.txt: %/baud
 	mkdir -p $(@D)
 	$< > $@
 _coverage: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so firmware/baud
-	test/test.sh driver/serial_keyboard.lua $(ASSERTION_LIB) $^
+	test/test.sh driver/start.sh $(ASSERTION_LIB) $^
 firmware/%.so driver/%.so driver/%ytes driver/%.txt firmware/bau%: always
 	$(MAKE) -C $$(echo $@ | sed 's|/| |') CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
 always:

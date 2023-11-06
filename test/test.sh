@@ -29,9 +29,6 @@ echo using $stty_path
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
-# clean that up later
-driver_script=$(dirname $driver_script)/start.sh
-
 echo ----------------------- E2E PREP ----------------------
 dev=$PWD/dev
 

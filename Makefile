@@ -104,7 +104,7 @@ check-format: stylua clang-format
 	! grep -nHw g'++' $(ALL_FILES)
 clang-format stylua luacov lcov:
 	which $@
-baud-check: tmp/firmware-baud.txt tmp/driver-baud.txt
+baud-check: tmp/firmware-baud.txt driver/baud.txt
 	diff $^
 tmp/%-baud.txt: %/baud
 	mkdir -p $(@D)

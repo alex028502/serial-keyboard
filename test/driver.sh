@@ -17,8 +17,8 @@ shift
 
 # just to make sure that whatever is configured in the baud program is what gets
 # used when configuring the tty with stty
-baud_program=$(dirname $driver_script)/baud
-baud=$($baud_program)
+baud_file=$(dirname $driver_script)/baud.txt
+baud=$(cat $baud_file)
 
 # so that it uses fake stty
 export PATH="$(dirname $0)/path:$PATH"

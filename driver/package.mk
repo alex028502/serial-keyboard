@@ -17,7 +17,7 @@ package:
 	$(MAKE) -f $(MAKEFILE_LIST) $@/DEBIAN/control
 package/DEBIAN/control: resources/control
 	sed "s/{ VERSION }/$(shell date +"%Y%m%d%H%M%S").$(GIT_HASH)/" $< > $@
-package/usr/share/serial-keyboard: baud serial_keyboard.lua serial_keyboard_lib.main.so start.sh
+package/usr/share/serial-keyboard: baud.txt serial_keyboard.lua serial_keyboard_lib.main.so start.sh
 	mkdir -p $@
 	cp $^ $@
 serial_keyboard_lib.main.so: always

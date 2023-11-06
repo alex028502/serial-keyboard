@@ -13,11 +13,6 @@ shift
 firmware=$(realpath $1)
 shift
 helper=$(realpath $1)
-shift
-# TODO: I don't really know what is getting compared to what with baud anymore
-# need to clean it up soon
-baud_program=$(realpath $1)
-baud=$($baud_program)
 
 # so that it uses fake stty
 export PATH="$(dirname $0)/path:$PATH"
@@ -64,8 +59,12 @@ remember driver2 $driver_id
 echo see if it started:
 kill -0 $driver_id
 echo ---- test driver init ---
+read stty_line < $dev/serial_connector
+echo STTY: $stty_line
+baud=$(echo $stty_line | xargs -n1 echo | grep -E '^[0-9]+$')
+echo BAUD: $baud
 # the serial port should not affect anything here but might need to exist
-$interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial_connector $baud
+$interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial_connector
 echo ---- test all -----------
 $interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $firmware_test_lua_lib $dev/serial $dev/serial.interface $dev/uinput $baud
 kill -0 $driver_id

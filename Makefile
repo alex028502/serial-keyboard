@@ -113,7 +113,7 @@ test-driver: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test
 	test/driver.sh driver/start.sh $(ASSERTION_LIB) $^
 test-error: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	test/errors.sh driver/start.sh $(ASSERTION_LIB) $^
-test-e2e: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so firmware/baud
+test-e2e: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	test/e2e.sh driver/start.sh $(ASSERTION_LIB) $^
 firmware/%.so driver/%.so driver/%ytes driver/%.txt firmware/bau%: always
 	$(MAKE) -C $$(echo $@ | sed 's|/| |') CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc

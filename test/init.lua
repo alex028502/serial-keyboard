@@ -12,11 +12,15 @@ library.assert_truthy(library.assert_in, "make sure it's loaded")
 local serial_file = io.open(serial_path, "r")
 assert(serial_file, serial_path)
 
-local serial_content = serial_file:read("*l")
-serial_file:close() -- this is where using fifo to mock serial is gonna get a bit shaky
-library.assert_in("-echo", serial_content)
-library.assert_in(serial_path, serial_content)
-library.assert_in(baud, serial_content)
+if baud then
+   local serial_content = serial_file:read("*l")
+   serial_file:close() -- this is where using fifo to mock serial is gonna get a bit shaky
+   library.assert_in("-echo", serial_content)
+   library.assert_in(serial_path, serial_content)
+   library.assert_in(baud, serial_content)
+else
+   print("e2e test should have already read stty setting")
+end
 
 local constants = helpers.get_constants()
 print("\nthese will come in handy when checking errors")

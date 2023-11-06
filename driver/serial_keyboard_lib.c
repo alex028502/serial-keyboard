@@ -18,13 +18,13 @@ static int l_setup_device(lua_State* L) {
   FILE* fp = stream->f;
   int fd = fileno(fp);
 
-  if (call_ioctl(fd, UI_SET_EVBIT, EV_KEY, 0) < 0) {
+  if (call_ioctl(fd, UI_SET_EVBIT, EV_KEY) < 0) {
     lua_pushinteger(L, -2);
     return 1;
   }
 
   for (int keycode = KEY_ESC; keycode <= KEY_MICMUTE; ++keycode) {
-    if (call_ioctl(fd, UI_SET_KEYBIT, keycode, 0) < 0) {
+    if (call_ioctl(fd, UI_SET_KEYBIT, keycode) < 0) {
       lua_pushinteger(L, -3);
       return 1;
     }
@@ -38,7 +38,7 @@ static int l_setup_device(lua_State* L) {
   uinp.id.vendor = 0x1234;
   uinp.id.product = 0x5678;
 
-  if (call_ioctl(fd, UI_DEV_SETUP, &uinp, 0) < 0) {
+  if (call_ioctl(fd, UI_DEV_SETUP, &uinp) < 0) {
     lua_pushinteger(L, -4);
     return 1;
   }
@@ -86,7 +86,7 @@ static int l_destroy(lua_State* L) {
   luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
   FILE* fp = stream->f;
   int fd = fileno(fp);
-  call_ioctl(fd, UI_DEV_DESTROY, 0);
+  call_ioctl(fd, UI_DEV_DESTROY);
 }
 
 static const luaL_Reg lib_functions[] = {{"destroy", l_destroy},

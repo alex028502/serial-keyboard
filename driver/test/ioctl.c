@@ -1,3 +1,4 @@
+#include <linux/uinput.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>  // For getenv
@@ -14,12 +15,12 @@ int call_ioctl(int fd, unsigned long request, ...) {
   va_list args;
   va_start(args, request);
 
-  int arg;
-  while (1) {
+  if (request == UI_DEV_SETUP) {
+    dprintf(fd, " [DATA]");
+  }
+
+  if (request == UI_SET_KEYBIT) {
     arg = va_arg(args, int);
-    if (arg == 0) {
-      break;
-    }
     dprintf(fd, " %d", arg);
   }
   dprintf(fd, "\n");

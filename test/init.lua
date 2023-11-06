@@ -51,9 +51,11 @@ for i = constants.KEY_ESC, constants.KEY_MICMUTE do
    assert_ioctl(uinput_interface, constants.UI_SET_KEYBIT, i)
 end
 
+local ui_dev_create = uinput_interface:read("*L")
+library.assert_in('[DATA]', ui_dev_create)
 -- would be cool to look up the pointer that is passed in
 -- and assert the data structure inside
-library.assert_in(constants.UI_DEV_SETUP, uinput_interface:read("*L"))
+library.assert_in(constants.UI_DEV_SETUP, ui_dev_create)
 assert_ioctl(uinput_interface, constants.UI_DEV_CREATE)
 
 print("\ndriver initialization checks")

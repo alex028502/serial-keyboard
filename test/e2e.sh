@@ -29,61 +29,11 @@ echo using $stty_path
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
-echo ----------------------- E2E PREP ----------------------
-dev=$PWD/dev
+source $(dirname $0)/prep.sh
 
-rm -rf $dev
-mkdir $dev
-
-processes=""
-
-function remember {
-    processes="$processes $@"
-}
-
-function cleanup {
-    echo
-    echo --------------------- CLEAN UP ------------------------
-    echo background process list
-    echo $processes | xargs -n2 echo
-    ids=$(echo $processes | xargs -n2 echo | awk '{ print $2 }')
-    echo kill $ids
-    kill $ids || echo nothing to clean-up
-    rm -rfv $dev
-    echo -------------------------------------------------------
-    echo
-}
-
-trap cleanup EXIT
 echo ---- OPEN FAKE UINPUT ---
 mkfifo $dev/uinput
 echo
-
-echo ---- TEST DRIVER --------
-mkfifo $dev/serial
-echo ---- start driver -------
-SERIAL_KEYBOARD_DEBUG=TRUE $driver_script $driver_lib $dev/serial $dev/uinput &
-driver_id=$!
-remember driver $driver_id
-sleep 1
-echo see if it started:
-kill -0 $driver_id
-echo ---- test driver init ---
-# the serial port should not affect anything here but might need to exist
-timeout 10 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial $baud
-echo ---- test driver --------
-$interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud
-echo ---- clean up ------------
-rm $dev/serial
-sleep 2
-echo check if driver is still running
-set +e
-kill -0 $driver_id
-driver_running_result=$?
-set -e
-[ "$driver_running_result" = 1 ]
-# will remain in the process list
-# so will try to TERM it again in cleanup
 
 echo
 echo ---- TEST E2E -----------
@@ -129,34 +79,4 @@ kill -0 $driver_id
 driver_running_result=$?
 set -e
 [ "$driver_running_result" = 1 ]
-echo ----------------------- ERRORS ------------------------
-mkfifo $dev/serial
-# complete coverage by trying out all the special error handling
-function test-error {
-    cat < $dev/uinput > /dev/null &
-    remember $1-cat-1 $!
-    cat < $dev/serial > /dev/null &
-    remember $1-cat-2 $!
-    set +e
-    timeout 1.2 $driver_script $driver_lib $dev/serial $dev/uinput
-    stat=$?
-    set -e
-    sign=$2
-    expectation="$stat $sign 124"
-    echo $expectation for $1
-    [ $expectation ]
-}
-
-ioctl_code=UI_SET_KEYBIT
-ioctl_code_number=$($interpreter $(dirname $0)/lookup.lua $library $helper $ioctl_code)
-echo checking that a failure of $ioctl_code\($ioctl_code_number\) causes failure
-IOCTL_ERROR=$ioctl_code_number test-error $ioctl_code -ne
-
-test-error normal-start "="
-
-rm $dev/uinput
-mkdir $dev/uinput
-
-test-error bad-uinput -ne
-echo ^^^^^ test error ^^^^^^
-echo ---- SUCCESS -----------
+echo ---- E2E SUCCESS -----------

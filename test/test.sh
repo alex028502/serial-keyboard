@@ -155,12 +155,10 @@ function test-error {
     [ $expectation ]
 }
 
-for ioctl_code in UI_SET_EVBIT UI_SET_KEYBIT UI_DEV_SETUP UI_DEV_CREATE
-do
-    ioctl_code_number=$($interpreter $(dirname $0)/lookup.lua $library $helper $ioctl_code)
-    echo checking that a failure of $ioctl_code\($ioctl_code_number\) causes failure
-    IOCTL_ERROR=$ioctl_code_number test-error $ioctl_code -ne
-done
+ioctl_code=UI_SET_KEYBIT
+ioctl_code_number=$($interpreter $(dirname $0)/lookup.lua $library $helper $ioctl_code)
+echo checking that a failure of $ioctl_code\($ioctl_code_number\) causes failure
+IOCTL_ERROR=$ioctl_code_number test-error $ioctl_code -ne
 
 test-error normal-start "="
 

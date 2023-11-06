@@ -109,7 +109,7 @@ baud-check: tmp/firmware-baud.txt tmp/driver-baud.txt
 tmp/%-baud.txt: %/baud
 	mkdir -p $(@D)
 	$< > $@
-test-driver: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so firmware/baud
+test-driver: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	test/driver.sh driver/start.sh $(ASSERTION_LIB) $^
 test-error: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	test/errors.sh driver/start.sh $(ASSERTION_LIB) $^

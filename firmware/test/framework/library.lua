@@ -12,12 +12,8 @@ local function is_falsy(a)
    return a == nil or a == false or a == 0 or a == ""
 end
 
-local function assert_falsy(a, m)
-   if m then
-      message = m
-   else
-      message = "assert falsy"
-   end
+local function assert_falsy(a)
+   message = "assert falsy"
    assert(is_falsy(a), message .. ": " .. tostring(a) .. " is not falsy")
 end
 

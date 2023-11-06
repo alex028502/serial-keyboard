@@ -94,7 +94,7 @@ assert-clean-coverage:
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'
 check-format: stylua clang-format
 	! ./list.sh | sed 's/ /SPACE/' | grep SPACE # no spaces in paths
-	./list.sh c cpp h ino | xargs clang-format --style=Chromium -Werror --dry-run
+	./list.sh c cpp h ino | xargs ./format.c.sh --dry-run
 	./list.sh lua | xargs $< --check
 	! ./list.sh | xargs grep -rnH '.*\s$$'
 	! ./list.sh | grep -v Makefile | grep -vw mk | xargs grep -nHP '\t'

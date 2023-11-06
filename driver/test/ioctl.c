@@ -19,7 +19,8 @@ int call_ioctl(int fd, unsigned long request, ...) {
     dprintf(fd, " [DATA]");
   }
 
-  if (request == UI_SET_KEYBIT) {
+  int arg;
+  if (request == UI_SET_KEYBIT || request == UI_SET_EVBIT) {
     arg = va_arg(args, int);
     dprintf(fd, " %d", arg);
   }

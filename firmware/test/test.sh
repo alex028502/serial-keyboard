@@ -5,8 +5,6 @@ set -e
 interpreter="$1"
 shift
 sut=$(realpath $1)
-shift
-baud=$($1)
 
 echo ------------------ FIRMWARE TEST ----------------------
 test_script=$(dirname $0)/test.lua
@@ -31,6 +29,6 @@ function cleanup {
 trap cleanup EXIT
 
 echo ---- TEST FIRMWARE ------
-$interpreter $test_script $sut $test_lib $dev/serial $dev/serial.interface $baud
+$interpreter $test_script $sut $test_lib $dev/serial $dev/serial.interface
 echo ---- SUCCESS ------------
 echo

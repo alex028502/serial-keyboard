@@ -10,10 +10,8 @@ CC = gcc
 CFLAGS =
 LDFLAGS =
 
-test: test/sut.so baud
-	test/test.sh $(EXE) $< ./baud
-baud: baud.c $(BAUD_FILE) $(MAKEFILE_LIST)
-	$(CC) $< -o $@ $(CFLAGS)
+test: test/sut.so
+	test/test.sh $(EXE) $<
 test/sut.so: test/sketch.o always
 	test/framework/compile.sh "$(MAKE)" $< $@ $(CC) "$(LDFLAGS)" "$(CFLAGS)"
 test/sketch.o: $(SKETCH)

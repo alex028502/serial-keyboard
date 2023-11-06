@@ -1,5 +1,6 @@
 #include <EEPROM.h>
-#include "baud.h"
+
+#define SERIAL_KEYBOARD_BAUD 115200
 
 const int buttonPin = 2;
 const int defaultCode = 53;  // x by default

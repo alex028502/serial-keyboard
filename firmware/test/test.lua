@@ -3,7 +3,7 @@
 -- well not so much the arduino program as the fake framework
 -- I mean the sketch worked right away
 
-local sut_path, library_path, firmware_lib_path, serial_path, serial_interface_path, baud =
+local sut_path, library_path, firmware_lib_path, serial_path, serial_interface_path =
    table.unpack(arg)
 
 library = dofile(library_path)
@@ -36,11 +36,8 @@ library.assert_equal(fake_device.serial_baud(), 0)
 fake_device.start()
 fake_device.sleep(0.2)
 library.assert_falsy(firmware_test_lib.get_led(fake_device))
-
-baud_rate = tonumber(baud)
-assert(baud_rate, baud)
-assert(baud_rate > 0, baud)
-library.assert_equal(fake_device.serial_baud(), baud_rate)
+local baud_rate = fake_device.serial_baud()
+assert(baud_rate > 0, baud_rate) -- the e2e tests make sure this matches
 
 local function try_out(code)
    firmware_test_lib.push_button(fake_device)

@@ -9,6 +9,16 @@
 
 int call_ioctl(int fd, unsigned long request, ...);
 
+static void mini_assert(lua_State* L,
+                        int assertion,
+                        int error_number,
+                        int error_param) {
+  if (!assertion) {
+    luaL_error(L, "FAILURE - SEARCH CODE FOR: %d - NOT: %d", error_number,
+               error_param);
+  }
+}
+
 // read the following to know what all this means
 // https://www.kernel.org/doc/html/v4.12/input/uinput.html
 
@@ -18,16 +28,12 @@ static int l_setup_device(lua_State* L) {
   FILE* fp = stream->f;
   int fd = fileno(fp);
 
-  if (call_ioctl(fd, UI_SET_EVBIT, EV_KEY) < 0) {
-    lua_pushinteger(L, -2);
-    return 1;
-  }
+  mini_assert(L, call_ioctl(fd, UI_SET_EVBIT, EV_KEY) >= 0, 1324, 2);
 
   for (int keycode = KEY_ESC; keycode <= KEY_MICMUTE; ++keycode) {
-    if (call_ioctl(fd, UI_SET_KEYBIT, keycode) < 0) {
-      lua_pushinteger(L, -3);
-      return 1;
-    }
+    int result = call_ioctl(fd, UI_SET_KEYBIT, keycode);
+    // TRY TO REMEMBER THIS - USUALLY YOU SEARCH FOR ERROR CODES
+    mini_assert(L, result >= 0, 234892, keycode);
   }
 
   struct uinput_user_dev uinp;
@@ -38,18 +44,11 @@ static int l_setup_device(lua_State* L) {
   uinp.id.vendor = 0x1234;
   uinp.id.product = 0x5678;
 
-  if (call_ioctl(fd, UI_DEV_SETUP, &uinp) < 0) {
-    lua_pushinteger(L, -4);
-    return 1;
-  }
+  mini_assert(L, call_ioctl(fd, UI_DEV_SETUP, &uinp) >= 0, 1325, 2);
 
-  if (call_ioctl(fd, UI_DEV_CREATE, 0) < 0) {
-    lua_pushinteger(L, -25);
-    return 1;
-  }
+  mini_assert(L, call_ioctl(fd, UI_DEV_CREATE, 0) >= 0, 1326, 2);
 
-  lua_pushinteger(L, 0);
-  return 1;
+  return 0;
 }
 
 static int l_get_key_event(lua_State* L) {

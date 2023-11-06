@@ -43,12 +43,7 @@ else
    pass()
 end
 
-local device_setup_result = lib.setup_device(uinput_file)
-if device_setup_result ~= 0 then
-   error("Failed to set up uinput device. " .. device_setup_result)
-else
-   pass()
-end
+lib.setup_device(uinput_file)
 
 print("driver has set up uinput device")
 

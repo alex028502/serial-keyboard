@@ -22,3 +22,5 @@ bytes: bytes.c main/ioctl.c
 	$(CC) -o $@ $^ $(CFLAGS)
 %.o: %.c Makefile
 	$(CC) -c -o $@ $(CFLAGS) -fPIC $< -I $(LUA_SRC)
+test-main: serial_keyboard_lib.test.so test/helpers.so
+	test/driver.sh start.sh $^

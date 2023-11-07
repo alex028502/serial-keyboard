@@ -1,3 +1,4 @@
+local luassert = require("luassert")
 local helper_path, library_path, uinput_interface_path, serial_path, baud =
    table.unpack(arg)
 
@@ -7,7 +8,7 @@ print("helper path", helper_path)
 library = dofile(library_path)
 
 helpers = library.import(helper_path, "luaopen_helpers")
-library.assert_truthy(library.assert_in, "make sure it's loaded")
+luassert.is.truthy(library.assert_in, "make sure it's loaded")
 
 local serial_file = io.open(serial_path, "r")
 assert(serial_file, serial_path)
@@ -43,7 +44,7 @@ function assert_ioctl(f, ...)
       end
    end
 
-   library.assert_equal(expected_line, line)
+   luassert.are.equals(expected_line, line)
 end
 
 print("\ncheck driver initialization")
@@ -64,11 +65,11 @@ local uinput_user_dev = helpers.parse_uinput_user_dev(uinput_user_dev_message)
 
 -- pretty much copied the answers from the implementation
 -- mainly just shows that it is sending a valid structure
-library.assert_equal(uinput_user_dev.name, "Example device")
-library.assert_equal(uinput_user_dev.vendor, 0x1234)
-library.assert_equal(uinput_user_dev.version, 4)
-library.assert_equal(uinput_user_dev.bustype, 3)
-library.assert_equal(uinput_user_dev.product, 0x5678)
+luassert.are.equals(uinput_user_dev.name, "Example device")
+luassert.are.equals(uinput_user_dev.vendor, 0x1234)
+luassert.are.equals(uinput_user_dev.version, 4)
+luassert.are.equals(uinput_user_dev.bustype, 3)
+luassert.are.equals(uinput_user_dev.product, 0x5678)
 
 assert_ioctl(uinput_interface, constants.UI_DEV_CREATE)
 

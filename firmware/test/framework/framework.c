@@ -35,7 +35,7 @@ static int l_stop(lua_State* L) {
 
 static int l_digitalRead(lua_State* L) {
   uint8_t pin = luaL_checkinteger(L, 1);
-  lua_pushinteger(L, digitalRead(pin));
+  lua_pushboolean(L, digitalRead(pin));
   return 1;
 }
 

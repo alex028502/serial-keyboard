@@ -1,3 +1,4 @@
+local luassert = require("luassert")
 -- it was too hard to get everything working at once
 -- so I needed to test the arduino program on its own first
 -- well not so much the arduino program as the fake framework
@@ -16,38 +17,38 @@ DEFAULT_CODE = firmware_test_lib.DEFAULT_CODE
 
 function assert_message(f, code, key)
    local message = f:read("L")
-   library.assert_truthy(message, "something written")
-   library.assert_equal(code .. tostring(key) .. "\n", message)
+   luassert.is.truthy(message, "something written")
+   luassert.are.equals(code .. tostring(key) .. "\n", message)
 end
 
-library.assert_truthy(DEFAULT_CODE, "make sure it's loaded")
+luassert.is.truthy(DEFAULT_CODE, "make sure it's loaded")
 
 LED_PIN = fake_device.led_builtin()
 print("led pin is " .. LED_PIN)
 
 local serial = io.open(serial_path, "r+")
 local serial_interface = io.open(serial_interface_path, "r+")
-library.assert_truthy(serial, "serial port that connects to computer")
-library.assert_truthy(serial_interface, "serial port to control simulation")
+luassert.is.truthy(serial, "serial port that connects to computer")
+luassert.is.truthy(serial_interface, "serial port to control simulation")
 
 fake_device.serial_init(serial_interface)
 fake_device.clear_eeprom()
-library.assert_equal(fake_device.serial_baud(), 0)
+luassert.are.equals(fake_device.serial_baud(), 0)
 fake_device.start()
 fake_device.sleep(0.2)
-library.assert_falsy(firmware_test_lib.get_led(fake_device))
+luassert.is.falsy(firmware_test_lib.get_led(fake_device))
 local baud_rate = fake_device.serial_baud()
 assert(baud_rate > 0, baud_rate) -- the e2e tests make sure this matches
 
 local function try_out(code)
    firmware_test_lib.push_button(fake_device)
    fake_device.sleep(1)
-   library.assert_truthy(firmware_test_lib.get_led(fake_device))
+   luassert.is.truthy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "D", code)
 
    firmware_test_lib.release_button(fake_device)
    fake_device.sleep(0.2)
-   library.assert_falsy(firmware_test_lib.get_led(fake_device))
+   luassert.is.falsy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "U", code)
 end
 

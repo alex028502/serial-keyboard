@@ -32,7 +32,9 @@ tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
 coverage/main: coverage.info tests.desc
 	rm -rf $@
-coverage.info: tmp.coverage.info
+coverage.info: tmp2.coverage.info
+	lcov $(BRANCH) --remove $< '*/lua/5.4/*' -o $@
+tmp2.coverage.info: tmp.coverage.info
 	cat $< | sed 's|SF:/|ABC|' | sed "s|SF:|SF:$(PWD)/|" | sed 's|ABC|SF:/|' > $@
 tmp.coverage.info: $(ALL_FILES)
 	bashcov ./entry.sh $(COVERAGE_FILES)

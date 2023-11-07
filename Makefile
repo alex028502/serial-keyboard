@@ -6,8 +6,7 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-STD_FORMAT = test-e2e.labeled.info driver.labeled.info
-COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) newline.labeled.info
+COVERAGE_FILES = firmware.labeled.info test-e2e.labeled.info driver.labeled.info newline.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 

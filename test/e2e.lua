@@ -1,3 +1,5 @@
+local luassert = require("luassert")
+
 local check_path, sut_path, helper_path, library_path, firmware_lib_path, serial_path, serial_interface_path, uinput_interface_path, baud =
    table.unpack(arg)
 
@@ -23,17 +25,17 @@ fake_device.serial_init(serial_interface)
 fake_device.clear_eeprom()
 fake_device.start()
 helpers.sleep(0.5)
-library.assert_falsy(firmware_library.get_led(fake_device))
+luassert.is.falsy(firmware_library.get_led(fake_device))
 
-library.assert_equal(fake_device.serial_baud(), tonumber(baud))
+luassert.are.equals(fake_device.serial_baud(), tonumber(baud))
 
 firmware_library.push_button(fake_device)
 check_next(uinput_interface, DEFAULT_CODE, 1)
-library.assert_truthy(firmware_library.get_led(fake_device))
+luassert.is.truthy(firmware_library.get_led(fake_device))
 
 firmware_library.release_button(fake_device)
 check_next(uinput_interface, DEFAULT_CODE, 0)
-library.assert_falsy(firmware_library.get_led(fake_device))
+luassert.is.falsy(firmware_library.get_led(fake_device))
 
 local serial = io.open(serial_path, "w")
 local new_code = 77
@@ -44,11 +46,11 @@ helpers.sleep(0.5)
 
 firmware_library.push_button(fake_device)
 check_next(uinput_interface, new_code, 1)
-library.assert_truthy(firmware_library.get_led(fake_device))
+luassert.is.truthy(firmware_library.get_led(fake_device))
 
 firmware_library.release_button(fake_device)
 check_next(uinput_interface, new_code, 0)
-library.assert_falsy(firmware_library.get_led(fake_device))
+luassert.is.falsy(firmware_library.get_led(fake_device))
 
 fake_device.stop()
 helpers.sleep(0.5)

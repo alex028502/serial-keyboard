@@ -7,7 +7,7 @@ ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
 STD_FORMAT = test-e2e.labeled.info driver.labeled.info test-meta.labeled.info
-COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) tools.labeled.info failure.labeled.info ioctl.labeled.info
+COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) tools.labeled.info failure.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -53,11 +53,6 @@ firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > lua.$@
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
-ioctl.coverage.info: driver/bytes $(ALL_FILES)
-	$(MAKE) clean-coverage
-	./driver/test/ioctl.sh driver/bytes
-	! $(MAKE) assert-clean-coverage
-	lcov $(BRANCH) --capture --directory . --output-file $@
 test-%.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	./with-lua.sh lua.$@ $(MAKE) test-$* CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc

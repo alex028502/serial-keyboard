@@ -6,7 +6,7 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-COVERAGE_FILES = firmware.labeled.info test-e2e.labeled.info driver.labeled.info newline.labeled.info
+COVERAGE_FILES = firmware.labeled.info e2e.labeled.info driver.labeled.info newline.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -52,9 +52,9 @@ firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > lua.$@
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
-test-%.coverage.info: $(ALL_FILES)
+e2e.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./with-lua.sh lua.$@ $(MAKE) test-$* CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
+	./with-lua.sh lua.$@ $(MAKE) test-e2e CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
 	! $(MAKE) assert-clean-coverage
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@

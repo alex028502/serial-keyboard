@@ -4,7 +4,8 @@ C_COVERAGE_PATTERN = '*.gcda'
 LUA_COVERAGE_PATTERN = 'luacov.*.out'
 
 ALL_FILES := $(shell ./list.sh)
-ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
+ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware/)
+ALL_DRIVER_FILES := $(shell ./list.sh | grep -w driver/)
 
 COVERAGE_FILES = firmware.labeled.info mono.labeled.info driver.labeled.info
 
@@ -62,7 +63,7 @@ mono.coverage.info: $(ALL_FILES)
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 mono: test-e2e newline
-driver.coverage.info: $(ALL_FILES)
+driver.coverage.info: $(ALL_DRIVER_FILES)
 	$(MAKE) clean-coverage
 	./with-lua.sh - $(MAKE) -C driver test $(OPTIONS)
 	cd driver && luacov -r lcov
@@ -97,8 +98,8 @@ clang-format stylua luacov lcov:
 	which $@
 test-e2e: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	./e2e.sh driver/start.sh $^
-firmware/%.so driver/%.so driver/%ytes driver/%.txt firmware/bau%: always
-	$(MAKE) -C $$(echo $@ | sed 's|/| |') CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
+firmware/%.so driver/%.so driver/%.txt: always
+	$(MAKE) -C $$(echo $@ | sed 's|/| |') $(OPTIONS)
 always:
 clean:
 	find -type f | git check-ignore --stdin | grep -v '.git' | xargs rm -f

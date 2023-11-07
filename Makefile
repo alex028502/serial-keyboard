@@ -27,6 +27,7 @@ report: coverage.info tests.desc
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details --branch-coverage
 bash-tools:
 	! misc/if-else.sh misc/if-else.txt
+	@echo ^^^^^ test error - expected ^^^^^^
 tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
 coverage/main: coverage.info tests.desc
@@ -70,6 +71,7 @@ driver.coverage.info: $(ALL_FILES)
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 newline: tmp/nonewline.txt $(ALL_FILES)
 	! lua5.4 misc/newline.lua $<
+	@echo ^^^^^ test error - expected ^^^^^^
 	lua5.4 misc/newline.lua Makefile
 tmp/nonewline.txt: Makefile
 	mkdir -p $(@D)

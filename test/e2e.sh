@@ -4,8 +4,8 @@ set -e
 
 driver_script=$(realpath $1)
 shift
-library=$(realpath $1)
-shift
+library=$(dirname $0)/library.lua
+
 interpreter=lua5.4
 
 driver_lib=$(realpath $1)

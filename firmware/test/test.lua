@@ -4,12 +4,12 @@ local luassert = require("luassert")
 -- well not so much the arduino program as the fake framework
 -- I mean the sketch worked right away
 
-local sut_path, library_path, firmware_lib_path, serial_path, serial_interface_path =
+local sut_path, firmware_lib_path, serial_path, serial_interface_path =
    table.unpack(arg)
 
-library = dofile(library_path)
-print("fake device path", sut_path)
-fake_device = library.import(sut_path, "luaopen_sut")
+fake_device_lib, fake_device_lib_err = package.loadlib(sut_path, "luaopen_sut")
+luassert.is.falsy(fake_device_lib_err)
+fake_device = fake_device_lib()
 
 print("firmware specific testing library", firmware_lib_path)
 firmware_test_lib = dofile(firmware_lib_path)

@@ -6,8 +6,8 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-STD_FORMAT = test-e2e.labeled.info test-driver.labeled.info test-error.labeled.info
-COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) tools.labeled.info failure.labeled.info ioctl.labeled.info meta.labeled.info
+STD_FORMAT = test-e2e.labeled.info test-driver.labeled.info test-error.labeled.info test-meta.labeled.info
+COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) tools.labeled.info failure.labeled.info ioctl.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -64,11 +64,8 @@ test-%.coverage.info: $(ALL_FILES)
 	! $(MAKE) assert-clean-coverage
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
-meta.coverage.info: $(ALL_FILES)
-	$(MAKE) clean-coverage
-	./with-lua.sh lua.$@ ./test/meta.sh driver/test/helpers.so
-	lcov $(BRANCH) --capture --directory . --output-file c.$@
-	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
+test-meta: $(ALL_FILES)
+	./test/meta.sh driver/test/helpers.so
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage

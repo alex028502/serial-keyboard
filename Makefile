@@ -106,7 +106,7 @@ check-format: stylua clang-format
 	! grep -nHw g'++' $(ALL_FILES)
 clang-format stylua luacov lcov:
 	which $@
-test-error: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
+test-error: driver/serial_keyboard_lib.test.so driver/test/helpers.so
 	driver/test/errors.sh driver/start.sh $^
 test-e2e: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	./e2e.sh driver/start.sh $^

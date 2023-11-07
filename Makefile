@@ -66,10 +66,9 @@ test-%.coverage.info: $(ALL_FILES)
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 meta.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./with-lua.sh - ./test/meta.sh driver/test/helpers.so
+	./with-lua.sh lua.$@ ./test/meta.sh driver/test/helpers.so
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
-	luacov -r lcov
-	lcov $(BRANCH) -a luacov.report.out -a c.$@ -o $@
+	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage

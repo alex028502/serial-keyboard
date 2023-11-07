@@ -4,7 +4,7 @@ set -e
 
 driver_script=$(realpath $1)
 shift
-library=$(dirname $0)/library.lua
+library=$(dirname $0)/driver/test/library.lua
 
 interpreter=lua5.4
 
@@ -15,16 +15,16 @@ shift
 helper=$(realpath $1)
 
 # so that it uses fake stty
-export PATH="$(dirname $0)/path:$PATH"
+export PATH="$(dirname $0)/driver/test/path:$PATH"
 stty_path=$(which stty)
 echo using $stty_path
-[ "$stty_path" == "$(dirname $0)/path/stty" ]
+[ "$stty_path" == "$(dirname $0)/driver/test/path/stty" ]
 
 # we could probably just pass in the path to the firmware project but we need
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lua_lib=$(dirname $firmware)/library.lua
 
-source $(dirname $0)/prep.sh
+source $(dirname $0)/driver/test/prep.sh
 
 echo ---- OPEN FAKE UINPUT ---
 mkfifo $dev/uinput
@@ -64,9 +64,9 @@ echo STTY: $stty_line
 baud=$(echo $stty_line | xargs -n1 echo | grep -E '^[0-9]+$')
 echo BAUD: $baud
 # the serial port should not affect anything here but might need to exist
-$interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial_connector
+$interpreter $(dirname $0)/driver/test/init.lua $helper $library $dev/uinput $dev/serial_connector
 echo ---- test all -----------
-$interpreter $(dirname $0)/e2e.lua $(dirname $0)/lib.lua $firmware $helper $library $firmware_test_lua_lib $dev/serial $dev/serial.interface $dev/uinput $baud
+$interpreter $(dirname $0)/misc/e2e.lua $(dirname $0)/driver/test/lib.lua $firmware $helper $library $firmware_test_lua_lib $dev/serial $dev/serial.interface $dev/uinput $baud
 kill -0 $driver_id
 # we didn't save the id in a variable so we can look it up in the process list
 socat_pid=$(echo $processes | xargs -n2 echo | grep -w serial | awk '{ print $2 }')

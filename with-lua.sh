@@ -6,7 +6,7 @@ export ORIGINAL_LUA_EXE_PATH="$(which lua5.4)"
 
 # get the full path to bin
 cd $(dirname $0)
-export PATH="$PWD/bin:$PATH"
+export PATH="$PWD/misc/bin:$PATH"
 cd - > /dev/null
 
 coverage_file="$1"

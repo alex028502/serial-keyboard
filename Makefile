@@ -25,7 +25,7 @@ report: coverage.info tests.desc
 	rm -rf $@
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details --branch-coverage
 bash-tools:
-	! ./if-else.sh if-else.txt
+	! misc/if-else.sh misc/if-else.txt
 tests.desc: coverage.info
 	cat $< | grep TN | sed 's|TN:|TD: |' | xargs -I {} echo {} {} | sed 's/TD/TN/' | sort | uniq | xargs -n2 echo > $@
 coverage/main: coverage.info tests.desc
@@ -69,11 +69,11 @@ test-meta: $(ALL_FILES)
 tools.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	$(MAKE) assert-clean-coverage
-	./with-lua.sh $@ lua5.4 newline.lua Makefile
+	./with-lua.sh $@ lua5.4 misc/newline.lua Makefile
 	! $(MAKE) assert-clean-coverage
 failure.coverage.info: tmp/nonewline.txt $(ALL_FILES)
 	$(MAKE) clean-coverage
-	! ./with-lua.sh - lua5.4 newline.lua $<
+	! ./with-lua.sh - lua5.4 misc/newline.lua $<
 	! $(MAKE) assert-clean-coverage
 	luacov -r lcov
 	mv luacov.report.out $@
@@ -90,12 +90,12 @@ assert-clean-coverage:
 	! find . -name $(LUA_COVERAGE_PATTERN) | grep '.'
 check-format: stylua clang-format
 	! ./list.sh | sed 's/ /SPACE/' | grep SPACE # no spaces in paths
-	./list.sh c cpp h ino | xargs ./format.c.sh --dry-run
+	./list.sh c cpp h ino | xargs misc/format.c.sh --dry-run
 	./list.sh lua | xargs $< --check
 	! ./list.sh | xargs grep -rnH '.*\s$$'
 	! ./list.sh | grep -v Makefile | grep -vw mk | xargs grep -nHP '\t'
-	./list.sh | xargs -n1 lua5.4 newline.lua
-	./list.sh lua | xargs ./if-else.sh
+	./list.sh | xargs -n1 lua5.4 misc/newline.lua
+	./list.sh lua | xargs ./misc/if-else.sh
 	! grep -nHw g'++' $(ALL_FILES)
 clang-format stylua luacov lcov:
 	which $@

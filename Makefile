@@ -7,7 +7,7 @@ ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
 STD_FORMAT = test-e2e.labeled.info driver.labeled.info
-COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) tools.labeled.info failure.labeled.info
+COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) newline.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -66,17 +66,13 @@ driver.coverage.info: $(ALL_FILES)
 	cat driver/luacov.report.out | sed "s|SF:/|SFS|" | sed "s|SF:|SF:$(PWD)/driver/|" | sed "s|SFS|SF:/|"  > lua.$@
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
-tools.coverage.info: $(ALL_FILES)
+newline.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	$(MAKE) assert-clean-coverage
-	./with-lua.sh $@ lua5.4 misc/newline.lua Makefile
+	./with-lua.sh $@ $(MAKE) newline
 	! $(MAKE) assert-clean-coverage
-failure.coverage.info: tmp/nonewline.txt $(ALL_FILES)
-	$(MAKE) clean-coverage
-	! ./with-lua.sh - lua5.4 misc/newline.lua $<
-	! $(MAKE) assert-clean-coverage
-	luacov -r lcov
-	mv luacov.report.out $@
+newline: tmp/nonewline.txt $(ALL_FILES)
+	! lua5.4 misc/newline.lua $<
+	lua5.4 misc/newline.lua Makefile
 tmp/nonewline.txt: Makefile
 	mkdir -p $(@D)
 	echo hello > $@

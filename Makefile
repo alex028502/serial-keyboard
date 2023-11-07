@@ -1,7 +1,5 @@
 .PHONY: test always-execute clang-format _coverage coverage clean-coverage
 
-ASSERTION_LIB = firmware/test/framework/library.lua
-
 C_COVERAGE_PATTERN = '*.gcda'
 LUA_COVERAGE_PATTERN = 'luacov.*.out'
 
@@ -68,7 +66,7 @@ test-%.coverage.info: $(ALL_FILES)
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 meta.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./with-lua.sh - ./test/meta.sh $(ASSERTION_LIB) driver/test/helpers.so
+	./with-lua.sh - ./test/meta.sh driver/test/helpers.so
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
 	luacov -r lcov
 	lcov $(BRANCH) -a luacov.report.out -a c.$@ -o $@
@@ -106,11 +104,11 @@ check-format: stylua clang-format
 clang-format stylua luacov lcov:
 	which $@
 test-driver: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
-	test/driver.sh driver/start.sh $(ASSERTION_LIB) $^
+	test/driver.sh driver/start.sh $^
 test-error: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
-	test/errors.sh driver/start.sh $(ASSERTION_LIB) $^
+	test/errors.sh driver/start.sh $^
 test-e2e: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
-	test/e2e.sh driver/start.sh $(ASSERTION_LIB) $^
+	test/e2e.sh driver/start.sh $^
 firmware/%.so driver/%.so driver/%ytes driver/%.txt firmware/bau%: always
 	$(MAKE) -C $$(echo $@ | sed 's|/| |') CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
 always:

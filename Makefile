@@ -6,7 +6,7 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-COVERAGE_FILES = firmware.labeled.info e2e.labeled.info driver.labeled.info newline.labeled.info
+COVERAGE_FILES = firmware.labeled.info mono.labeled.info driver.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -52,12 +52,13 @@ firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > lua.$@
 	lcov $(BRANCH) --capture --directory . --output-file c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
-e2e.coverage.info: $(ALL_FILES)
+mono.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
-	./with-lua.sh lua.$@ $(MAKE) test-e2e CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
+	./with-lua.sh lua.$@ $(MAKE) mono CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
 	! $(MAKE) assert-clean-coverage
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
+mono: test-e2e newline
 driver.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	./with-lua.sh - $(MAKE) -C driver test CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-lgcov" CC=gcc
@@ -65,10 +66,6 @@ driver.coverage.info: $(ALL_FILES)
 	cat driver/luacov.report.out | sed "s|SF:/|SFS|" | sed "s|SF:|SF:$(PWD)/driver/|" | sed "s|SFS|SF:/|"  > lua.$@
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
-newline.coverage.info: $(ALL_FILES)
-	$(MAKE) clean-coverage
-	./with-lua.sh $@ $(MAKE) newline
-	! $(MAKE) assert-clean-coverage
 newline: tmp/nonewline.txt $(ALL_FILES)
 	! lua5.4 misc/newline.lua $<
 	lua5.4 misc/newline.lua Makefile

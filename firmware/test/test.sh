@@ -7,6 +7,7 @@ shift
 sut=$(realpath $1)
 
 echo ------------------ FIRMWARE TEST ----------------------
+# I predict none of this will work if there are spaces in paths
 test_script=$(dirname $0)/test.lua
 test_lib=$(dirname $0)/framework/library.lua
 firmware_test_lib=$(dirname $0)/library.lua

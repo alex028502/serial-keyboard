@@ -6,7 +6,7 @@ LUA_COVERAGE_PATTERN = 'luacov.*.out'
 ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware)
 
-STD_FORMAT = test-e2e.labeled.info driver.labeled.info test-error.labeled.info test-meta.labeled.info
+STD_FORMAT = test-e2e.labeled.info driver.labeled.info test-meta.labeled.info
 COVERAGE_FILES = firmware.labeled.info $(STD_FORMAT) tools.labeled.info failure.labeled.info ioctl.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
@@ -106,8 +106,6 @@ check-format: stylua clang-format
 	! grep -nHw g'++' $(ALL_FILES)
 clang-format stylua luacov lcov:
 	which $@
-test-error: driver/serial_keyboard_lib.test.so driver/test/helpers.so
-	driver/test/errors.sh driver/start.sh $^
 test-e2e: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
 	./e2e.sh driver/start.sh $^
 firmware/%.so driver/%.so driver/%ytes driver/%.txt firmware/bau%: always

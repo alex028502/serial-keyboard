@@ -18,8 +18,8 @@ $(PROJECT_LIB).%.so: %/ioctl.o $(PROJECT_LIB).o
 	$(CC) -shared -o $@ -fPIC $^ $(LDFLAGS)
 test/helpers.so: test/helpers.o
 	$(CC) -shared -o $@ -fPIC $^ $(LDFLAGS)
-bytes: bytes.c main/ioctl.c
-	$(CC) -o $@ $^ $(CFLAGS)
+bytes: bytes.o main/ioctl.o
+	$(CC) -o $@ $^ $(LDFLAGS) -fPIC
 %.o: %.c Makefile
 	$(CC) -c -o $@ $(CFLAGS) -fPIC $< -I $(LUA_SRC)
 test: test-main test-error test-ioctl test-meta

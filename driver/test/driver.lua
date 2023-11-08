@@ -1,3 +1,4 @@
+local luassert = require("luassert")
 local check_path, helper_path, library_path, serial_interface_path, uinput_interface_path, baud =
    table.unpack(arg)
 
@@ -32,5 +33,13 @@ serial_interface:write("U22\n")
 serial_interface:flush()
 
 check_next(uinput_interface, 22, 0)
+
+-- because of how the fifo works just closing our fd should be enough to shut
+-- the driver down
+serial_interface:close()
+
+local expected_last_line = "IOCTL: " .. helpers.get_constants().UI_DEV_DESTROY
+local last_line = uinput_interface:read("*l")
+luassert.are.equals(expected_last_line, last_line)
 
 print("driver alone seems ok")

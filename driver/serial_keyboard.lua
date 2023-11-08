@@ -64,7 +64,7 @@ for line in file:lines() do
 end
 
 print("cleaning up")
-lib.destroy(file)
+lib.destroy(uinput_file)
 uinput_file:close()
 print("cleaned up")
 

@@ -47,7 +47,6 @@ timeout 10 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev
 echo ---- test driver --------
 $interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud
 echo ---- clean up ------------
-rm $dev/serial
 timer=""
 while kill -0 $driver_id
 do

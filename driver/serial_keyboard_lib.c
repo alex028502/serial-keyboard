@@ -85,7 +85,7 @@ static int l_destroy(lua_State* L) {
   luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
   FILE* fp = stream->f;
   int fd = fileno(fp);
-  call_ioctl(fd, UI_DEV_DESTROY);
+  check_ioctl(L, call_ioctl(fd, UI_DEV_DESTROY), 1391, 2);
   return 0;
 }
 

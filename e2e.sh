@@ -70,12 +70,15 @@ $interpreter $(dirname $0)/misc/e2e.lua $(dirname $0)/driver/test/lib.lua $firmw
 kill -0 $driver_id
 # we didn't save the id in a variable so we can look it up in the process list
 socat_pid=$(echo $processes | xargs -n2 echo | grep -w serial | awk '{ print $2 }')
-kill -0 $socat_pid
 kill $socat_pid
-sleep 2
-set +e
-kill -0 $driver_id
-driver_running_result=$?
-set -e
-[ "$driver_running_result" = 1 ]
+while kill -0 $driver_id
+do
+    timer="x$timer"
+    c="$(echo $timer | wc -c)"
+    # maxium two seconds
+    # that was the sleep before but it seems to need about 11 iterations
+    echo waiting for driver to shut down $c
+    [ "$c" != 20 ]
+    sleep 0.1
+done
 echo ---- E2E SUCCESS -----------

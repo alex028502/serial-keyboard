@@ -86,6 +86,7 @@ static int l_destroy(lua_State* L) {
   FILE* fp = stream->f;
   int fd = fileno(fp);
   call_ioctl(fd, UI_DEV_DESTROY);
+  return 0;
 }
 
 static const luaL_Reg lib_functions[] = {{"destroy", l_destroy},

@@ -68,7 +68,7 @@ driver.coverage.info: $(ALL_DRIVER_FILES)
 	./with-lua.sh - $(MAKE) -C driver test $(OPTIONS)
 	cd driver && luacov -r lcov
 	cat driver/luacov.report.out | sed "s|SF:/|SFS|" | sed "s|SF:|SF:$(PWD)/driver/|" | sed "s|SFS|SF:/|"  > lua.$@
-	lcov $(BRANCH) --capture --directory . -o c.$@
+	lcov $(BRANCH) --capture --directory driver -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 newline: tmp/nonewline.txt $(ALL_FILES)
 	! lua5.4 misc/newline.lua $<

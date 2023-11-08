@@ -69,8 +69,6 @@ jobs:
         include:
           - cc: gcc
             option:
-          - cc: gcc
-            option: CC=gcc
           - cc: clang
             option: CC=clang
     steps:

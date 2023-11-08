@@ -62,7 +62,7 @@ jobs:
         with:
           name: serial-keyboard-${{ env.sha_short }}.deb
           path: ./driver/serial-keyboard.deb
-  firmware-job:
+  subprojects-job:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -83,17 +83,19 @@ jobs:
       - name: luarocks deps
         shell: bash
         run: sudo luarocks install --lua-version=5.4 luassert
-      - name: test
+      - name: test firmware subproject
         run: make -C firmware test ${{ matrix.option }}
+      - name: test driver subproject
+        run: make -C driver test ${{ matrix.option }}
       - name: ${{ matrix.cc }} check
         shell: bash
-        run: find firmware -name '*.o' | xargs readelf -p .comment | grep -i ${{ matrix.cc }}
+        run: find . -name '*.o' | xargs readelf -p .comment | grep -i ${{ matrix.cc }}
       - name: only ${{ matrix.cc }} check
         shell: bash
         run: |
           OTHER_COMPILER=$(echo clang gcc | xargs -n1 echo | grep -v ${{ matrix.cc }})
           echo make sure we are not accidentally using $OTHER_COMPILER
-          ! find firmware -name '*.o' | xargs readelf -p .comment | grep -i $OTHER_COMPILER
+          ! find . -name '*.o' | xargs readelf -p .comment | grep -i $OTHER_COMPILER
       - name: no runtime or compiletime coverage info
         shell: bash
         run: |

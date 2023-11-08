@@ -33,4 +33,4 @@ test-error: $(PROJECT_LIB).main.so $(PROJECT_LIB).test.so test/helpers.so
 test-ioctl: bytes
 	test/ioctl.sh $<
 test-meta: test/helpers.so
-	test/meta.sh $<
+	$(LUA) test/meta.lua test/library.lua $<

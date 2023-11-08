@@ -1,5 +1,5 @@
 local luassert = require("luassert")
-local check_path, helper_path, library_path, serial_interface_path, uinput_interface_path, baud =
+local check_path, helper_path, library_path, serial_interface_path, uinput_interface_path, baud, driver_pid =
    table.unpack(arg)
 
 print("local lib path", check_path)
@@ -43,3 +43,12 @@ local last_line = uinput_interface:read("*l")
 luassert.are.equals(expected_last_line, last_line)
 
 print("driver alone seems ok")
+c = 0
+while os.execute("kill -0 " .. driver_pid) do
+   c = c + 1
+   -- maximum two seconds
+   -- because the program actually sleeps 1 second after the tty is closed
+   print("waiting for driver to shut down nicely" .. c)
+   assert(c ~= 20)
+   helpers.sleep(100)
+end

@@ -45,17 +45,5 @@ echo ---- test driver init ---
 # the serial port should not affect anything here but might need to exist
 timeout 10 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial $baud
 echo ---- test driver --------
-$interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud
-echo ---- clean up ------------
-timer=""
-while kill -0 $driver_id
-do
-    timer="x$timer"
-    c="$(echo $timer | wc -c)"
-    # maximum two seconds
-    # because the program actually sleeps 1 second after the tty is closed
-    echo waiting for driver to shut down nicely $c
-    [ "$c" != 20 ]
-    sleep 0.1
-done
+$interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud $driver_id
 echo ---- SUCCESS -----------

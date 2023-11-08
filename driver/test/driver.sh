@@ -38,7 +38,7 @@ echo ---- start driver -------
 SERIAL_KEYBOARD_DEBUG=TRUE $driver_script $driver_lib $dev/serial $dev/uinput &
 driver_id=$!
 remember driver $driver_id
-sleep 1
+sleep 0.2
 echo see if it started:
 kill -0 $driver_id
 echo ---- test driver init ---
@@ -48,12 +48,15 @@ echo ---- test driver --------
 $interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud
 echo ---- clean up ------------
 rm $dev/serial
-sleep 2
-echo check if driver is still running
-set +e
-kill -0 $driver_id
-driver_running_result=$?
-set -e
-[ "$driver_running_result" = 1 ]
-
+timer=""
+while kill -0 $driver_id
+do
+    timer="x$timer"
+    c="$(echo $timer | wc -c)"
+    # maximum two seconds
+    # because the program actually sleeps 1 second after the tty is closed
+    echo waiting for driver to shut down nicely $c
+    [ "$c" != 20 ]
+    sleep 0.1
+done
 echo ---- SUCCESS -----------

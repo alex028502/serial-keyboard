@@ -8,6 +8,9 @@ library=$(dirname $0)/library.lua
 
 interpreter=lua5.4
 
+real_driver_lib=$(realpath $1)
+shift
+
 driver_lib=$(realpath $1)
 shift
 
@@ -30,12 +33,19 @@ echo ------------------ TEST ERRORS ------------------------
 mkfifo $dev/serial
 # complete coverage by trying out all the special error handling
 function test-error {
+    if [ "$3" = "" ]
+    then
+        _driver_lib=$driver_lib
+    else
+        _driver_lib=$3
+    fi
+
     cat < $dev/uinput > /dev/null &
     remember $1-cat-1 $!
     cat < $dev/serial > /dev/null &
     remember $1-cat-2 $!
     set +e
-    timeout 1.2 $driver_script $driver_lib $dev/serial $dev/uinput
+    timeout 1.2 $driver_script $_driver_lib $dev/serial $dev/uinput
     stat=$?
     set -e
     sign=$2
@@ -44,10 +54,8 @@ function test-error {
     [ $expectation ]
 }
 
-ioctl_code=UI_SET_KEYBIT
-ioctl_code_number=$($interpreter $(dirname $0)/lookup.lua $library $helper $ioctl_code)
-echo checking that a failure of $ioctl_code\($ioctl_code_number\) causes failure
-IOCTL_ERROR=$ioctl_code_number test-error $ioctl_code -ne
+test-error real-lib -ne $real_driver_lib
+echo ^^^^^ test error ^^^^^^
 
 test-error normal-start "="
 

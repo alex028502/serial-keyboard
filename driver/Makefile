@@ -1,5 +1,8 @@
 .SUFFIXES:
 
+# thanks https://unix.stackexchange.com/questions/517190/what-causes-make-to-delete-intermediate-files
+.PRECIOUS: %.o
+
 PROJECT = serial_keyboard
 PROJECT_LIB = $(PROJECT)_lib
 
@@ -25,7 +28,7 @@ bytes: bytes.o main/ioctl.o
 test: test-main test-error test-ioctl test-meta
 test-main: $(PROJECT_LIB).test.so test/helpers.so
 	test/driver.sh start.sh $^
-test-error: $(PROJECT_LIB).test.so test/helpers.so
+test-error: $(PROJECT_LIB).main.so $(PROJECT_LIB).test.so test/helpers.so
 	test/errors.sh start.sh $^
 test-ioctl: bytes
 	test/ioctl.sh $<

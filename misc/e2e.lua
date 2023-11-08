@@ -17,7 +17,7 @@ DEFAULT_CODE = firmware_library.DEFAULT_CODE
 
 local uinput_interface = io.open(uinput_interface_path, "rb")
 local serial_interface = io.open(serial_interface_path, "r+")
-local check_next = dofile(check_path)(library, helpers)
+local check_next = dofile(check_path)(helpers)
 
 print("\nnow the real thing")
 

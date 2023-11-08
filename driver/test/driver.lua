@@ -8,7 +8,7 @@ print("helper path", helper_path)
 library = dofile(library_path)
 
 helpers = library.import(helper_path, "luaopen_helpers")
-local check_next = dofile(check_path)(library, helpers)
+local check_next = dofile(check_path)(helpers)
 
 local uinput_interface = io.open(uinput_interface_path, "rb")
 

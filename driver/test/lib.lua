@@ -1,6 +1,6 @@
 local luassert = require("luassert")
 
-local function check_next(library, helpers, f, code, action)
+local function check_next(helpers, f, code, action)
    local constants = helpers.get_constants()
    local main_event = f:read(helpers.event_size())
    local syn_event = f:read(helpers.event_size())
@@ -16,9 +16,9 @@ local function check_next(library, helpers, f, code, action)
    luassert.are.equals(syn_value, 0)
 end
 
-return function(library, helpers)
+return function(helpers)
    return function(...)
       local args = { ... }
-      return check_next(library, helpers, table.unpack(args))
+      return check_next(helpers, table.unpack(args))
    end
 end

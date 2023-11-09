@@ -12,13 +12,15 @@ LDFLAGS =
 
 TEST_MODULES = $(FRAMEWORK)/serial.cpp.o $(FRAMEWORK)/EEPROM.cpp.o $(FRAMEWORK)/gpio.c.o $(FRAMEWORK)/framework.c.o
 
-test: test/sut.so
+test-main: test/sut.so
 	test/test.sh $(EXE) $<
+test-framework: $(FRAMEWORK)/demo.so
+	test/demo.sh $(EXE) $<
 test/sut.so: test/sketch.o $(TEST_MODULES)
 	$(CC) -shared -fPIC $(TEST_MODULES) $< $(LDFLAGS) -lpthread -o $@
 $(FRAMEWORK)/%.o: always
 	$(MAKE) -C $(FRAMEWORK) $*.o CFLAGS="$(CFLAGS)" CC=$(CC)
-$(FRAMEWORK)/headers: always
+$(FRAMEWORK)/headers $(FRAMEWORK)/demo.so: always
 	$(MAKE) -C $(@D) $(@F)
 test/sketch.o: $(SKETCH) $(FRAMEWORK)/headers
 	$(CC) -c -fPIC -I test/framework -include test/framework/Arduino.h -x c++ $(CFLAGS) $< -o $@

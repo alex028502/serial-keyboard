@@ -92,6 +92,7 @@ set_key_and_try_out("2", 88) -- no change
 -- cores behave the same, or even behave at all - but this could be similar)
 -- Then this project, the button device would only need enough tests to cover a
 -- the cases that we are interested in
+-- BUT DON'T WORRY I HAVE MOVED THEM TO A SPECIAL TEST FOR THE FRAMEWORK
 
 set_key_and_try_out("20x", 88) -- no change
 set_key_and_try_out("x\n", 220)

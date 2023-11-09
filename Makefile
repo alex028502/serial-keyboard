@@ -7,7 +7,7 @@ ALL_FILES := $(shell ./list.sh)
 ALL_FIRMWARE_FILES := $(shell ./list.sh | grep -w firmware/)
 ALL_DRIVER_FILES := $(shell ./list.sh | grep -w driver/)
 
-COVERAGE_FILES = firmware.labeled.info mono.labeled.info driver.labeled.info
+COVERAGE_FILES = firmware-main.labeled.info mono.labeled.info driver.labeled.info firmware-framework.labeled.info
 
 BRANCH = --rc lcov_branch_coverage=1
 
@@ -49,9 +49,9 @@ missed-files: coverage.info
 	diff tmp/all-files.txt tmp/checked-files.txt
 %.labeled.info: %.coverage.info
 	sed "s|TN:|TN:$*|" $< > $@
-firmware.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
+firmware-%.coverage.info: $(ALL_FIRMWARE_FILES) Makefile
 	$(MAKE) clean-coverage
-	./with-lua.sh - $(MAKE) -C firmware test $(OPTIONS)
+	./with-lua.sh - $(MAKE) -C firmware test-$* $(OPTIONS)
 	cd firmware && luacov -r lcov
 	sed "s|SF:|SF:$(PWD)/firmware/|" firmware/luacov.report.out > lua.$@
 	lcov $(BRANCH) --capture --directory . --output-file c.$@

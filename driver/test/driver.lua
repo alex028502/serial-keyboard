@@ -15,8 +15,6 @@ local uinput_interface = io.open(uinput_interface_path, "rb")
 
 print("\nmaybe try the driver alone first")
 local serial_interface = io.open(serial_interface_path, "r+")
---[[ local serial_interface = io.open(serial_interface_path, "wb")
-print("opened " .. serial_interface_path .. " temporarily for wrinting") ]]
 serial_interface:write("D22\n")
 serial_interface:flush()
 

@@ -64,21 +64,5 @@ kill $socat_pid
 # the third one is not tested at all but manually I do it all the time when
 # trying this out - and it seems to work. one problem is that I haven't managed
 # to measure test coverage that way.
-timer=""
-while kill -0 $driver_id
-do
-    timer="x$timer"
-    c="$(echo $timer | wc -c)"
-    # maxium two seconds
-    # this took like eleven iterations when socat was connected to a fifo
-    # and turning off socat caused the fifo to end nicely - but now that the
-    # socat pty is connected directly to the driver, turning off socat causes
-    # an almost immediate error - so this only has one iteration but also
-    # doesn't seem to be immediate enough that this doesn't run (from coverage)
-    # so it is still necessary because cleaning up the driver with kill would
-    # mess up coverage
-    echo waiting for driver to shut down $c
-    [ "$c" != 20 ]
-    sleep 0.1
-done
+timeout 2 $(dirname $0)/misc/wait-for-pid.sh $driver_id waiting for driver to shut down
 echo ---- E2E SUCCESS -----------

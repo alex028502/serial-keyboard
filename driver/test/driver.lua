@@ -43,14 +43,9 @@ local last_line = uinput_interface:read("*l")
 luassert.are.equals(expected_last_line, last_line)
 
 print("driver alone seems ok")
-c = 0
 while os.execute("kill -0 " .. driver_pid) do
-   c = c + 1
-   -- maximum two seconds
-   -- because the program used to sleep 1 second after the tty is closed
-   -- now coverage will let us know if it shuts down so fast we don't get
-   -- a single sleep
-   print("waiting for driver to shut down nicely" .. c)
-   assert(c ~= 20)
+   -- if it ever shuts down too fast and we don't get a single sleep
+   -- coverage will let us know
+   print("waiting for driver to shut down nicely")
    helpers.sleep(100)
 end

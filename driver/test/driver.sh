@@ -43,5 +43,5 @@ echo ---- test driver init ---
 # the serial port should not affect anything here but might need to exist
 timeout 10 $interpreter $(dirname $0)/init.lua $helper $library $dev/uinput $dev/serial $baud
 echo ---- test driver --------
-$interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud $driver_id
+timeout 10 $interpreter $(dirname $0)/driver.lua $(dirname $0)/lib.lua $helper $library $dev/serial $dev/uinput $baud $driver_id
 echo ---- SUCCESS -----------

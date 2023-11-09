@@ -67,5 +67,3 @@ print("cleaning up")
 lib.destroy(uinput_file)
 uinput_file:close()
 print("cleaned up")
-
-lib.sleep(1000)

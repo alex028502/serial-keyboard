@@ -75,12 +75,6 @@ static int l_get_syn_event(lua_State* L) {
   return 1;
 }
 
-static int l_sleep(lua_State* L) {
-  int msec = luaL_checkinteger(L, 1);
-  usleep(msec * 1000);
-  return 0;
-}
-
 static int l_destroy(lua_State* L) {
   luaL_Stream* stream = luaL_checkudata(L, 1, LUA_FILEHANDLE);
   FILE* fp = stream->f;
@@ -90,7 +84,6 @@ static int l_destroy(lua_State* L) {
 }
 
 static const luaL_Reg lib_functions[] = {{"destroy", l_destroy},
-                                         {"sleep", l_sleep},
                                          {"get_key_event", l_get_key_event},
                                          {"get_syn_event", l_get_syn_event},
                                          {"setup_device", l_setup_device},

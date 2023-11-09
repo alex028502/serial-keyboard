@@ -64,5 +64,12 @@ kill $socat_pid
 # the third one is not tested at all but manually I do it all the time when
 # trying this out - and it seems to work. one problem is that I haven't managed
 # to measure test coverage that way.
-timeout 2 $(dirname $0)/misc/wait-for-pid.sh $driver_id waiting for driver to shut down
+sleep 0.2
+set +e
+kill -0 $driver_id
+driver_status=$?
+set -e
+echo driver running status $driver_status
+[ "$driver_status" = 1 ]
+echo ^^^^^ test error ^^^^^^
 echo ---- E2E SUCCESS -----------

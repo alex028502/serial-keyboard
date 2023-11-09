@@ -2,7 +2,7 @@
 .PHONY: demo always
 
 CC = gcc
-COV =
+CFLAGS =
 # -fno-exceptions https://stackoverflow.com/a/42078101
 COMPILE = $(CC) -fPIC -c -fno-exceptions
 LUA = lua5.4
@@ -12,6 +12,6 @@ headers: always
 	diff $@.tmp $@ || mv $@.tmp $@
 always:
 framework.c.o: framework.c Makefile headers
-	$(COMPILE) $(COV) -I /usr/include/$(LUA) $< -o $@
+	$(COMPILE) $(CFLAGS) -I /usr/include/$(LUA) $< -o $@
 %.o: % Makefile headers
-	$(COMPILE) $(COV) $< -o $@
+	$(COMPILE) $(CFLAGS) $< -o $@

@@ -17,7 +17,7 @@ test: test/sut.so
 test/sut.so: test/sketch.o $(TEST_MODULES)
 	$(CC) -shared -fPIC $(TEST_MODULES) $< $(LDFLAGS) -lpthread -o $@
 $(FRAMEWORK)/%.o: always
-	$(MAKE) -C $(FRAMEWORK) $*.o COV="$(CFLAGS)" CC=$(CC)
+	$(MAKE) -C $(FRAMEWORK) $*.o CFLAGS="$(CFLAGS)" CC=$(CC)
 $(FRAMEWORK)/headers: always
 	$(MAKE) -C $(@D) $(@F)
 test/sketch.o: $(SKETCH) $(FRAMEWORK)/headers

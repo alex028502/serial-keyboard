@@ -2,8 +2,8 @@
 
 set -e
 
-driver_script=$(realpath $1)
-shift
+driver_script=$(dirname $0)/driver/start.sh
+
 library=$(dirname $0)/driver/test/library.lua
 
 interpreter=lua5.4
@@ -14,9 +14,7 @@ firmware=$(realpath $1)
 shift
 helper=$(realpath $1)
 
-# we could probably just pass in the path to the firmware project but we need
-# to change a few thigs about the make file or start moving to bash from make
-firmware_test_lua_lib=$(dirname $firmware)/library.lua
+firmware_test_lua_lib=$(dirname $0)/firmware/test/library.lua
 
 source $(dirname $0)/driver/test/prep.sh
 

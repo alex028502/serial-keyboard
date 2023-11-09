@@ -97,7 +97,7 @@ check-format: stylua clang-format
 clang-format stylua luacov lcov:
 	which $@
 test-e2e: driver/serial_keyboard_lib.test.so firmware/test/sut.so driver/test/helpers.so
-	./e2e.sh driver/start.sh $^
+	./e2e.sh $^
 firmware/%.so driver/%.so driver/%.txt: always
 	$(MAKE) -C $$(echo $@ | sed 's|/| |') $(OPTIONS)
 always:

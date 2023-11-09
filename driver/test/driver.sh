@@ -19,12 +19,6 @@ shift
 baud_file=$(dirname $driver_script)/baud.txt
 baud=$(cat $baud_file)
 
-# so that it uses fake stty
-export PATH="$(dirname $0)/path:$PATH"
-stty_path=$(which stty)
-echo using $stty_path
-[ "$stty_path" == "$(dirname $0)/path/stty" ]
-
 source $(dirname $0)/prep.sh
 
 echo

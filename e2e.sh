@@ -14,12 +14,6 @@ firmware=$(realpath $1)
 shift
 helper=$(realpath $1)
 
-# so that it uses fake stty
-export PATH="$(dirname $0)/driver/test/path:$PATH"
-stty_path=$(which stty)
-echo using $stty_path
-[ "$stty_path" == "$(dirname $0)/driver/test/path/stty" ]
-
 # we could probably just pass in the path to the firmware project but we need
 # to change a few thigs about the make file or start moving to bash from make
 firmware_test_lua_lib=$(dirname $firmware)/library.lua

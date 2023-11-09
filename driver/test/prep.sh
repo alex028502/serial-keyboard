@@ -24,3 +24,10 @@ function cleanup {
 }
 
 trap cleanup EXIT
+
+# so that it uses fake stty
+path_dir=$(dirname $BASH_SOURCE)/path
+export PATH="$path_dir:$PATH"
+stty_path=$(which stty)
+echo using $stty_path
+[ "$stty_path" == "$path_dir/stty" ]

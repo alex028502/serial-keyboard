@@ -2,19 +2,23 @@
 
 set -e
 
-driver_script=$(dirname $0)/driver/start.sh
-
-library=$(dirname $0)/driver/test/library.lua
-
-interpreter=lua5.4
-
+# dependencies that require compilation are passed in to force us to mention
+# them in the makefile
 driver_lib=$(realpath $1)
 shift
 firmware=$(realpath $1)
 shift
 helper=$(realpath $1)
 
+# scripts that don't require compilation are just relative paths
+# lua scripts can't really have relative paths inside them but with .sh scripts
+# I need to try to make sure those don't hard code compiled dependencies
+# so that I don't run the tests with old dependencies by accident
+driver_script=$(dirname $0)/driver/start.sh
+library=$(dirname $0)/driver/test/library.lua
 firmware_test_lua_lib=$(dirname $0)/firmware/test/library.lua
+
+interpreter=lua5.4
 
 source $(dirname $0)/driver/test/prep.sh
 

@@ -47,7 +47,9 @@ c = 0
 while os.execute("kill -0 " .. driver_pid) do
    c = c + 1
    -- maximum two seconds
-   -- because the program actually sleeps 1 second after the tty is closed
+   -- because the program used to sleep 1 second after the tty is closed
+   -- now coverage will let us know if it shuts down so fast we don't get
+   -- a single sleep
    print("waiting for driver to shut down nicely" .. c)
    assert(c ~= 20)
    helpers.sleep(100)

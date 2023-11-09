@@ -72,12 +72,6 @@ static int l_event_size(lua_State* L) {
   return 1;
 }
 
-static int l_sleep(lua_State* L) {
-  float ms = luaL_checknumber(L, 1);
-  usleep(ms * 1000);
-  return 0;
-}
-
 static int l_get_constants(lua_State* L) {
   lua_newtable(L);
 
@@ -128,7 +122,6 @@ static const luaL_Reg helperlib[] = {
     {"read_key_event", l_read_key_event},
     {"parse_uinput_user_dev", l_parse_uinput_user_dev},
     {"get_constants", l_get_constants},
-    {"sleep", l_sleep},
     {"event_size", l_event_size},
     {NULL, NULL}};
 

@@ -24,7 +24,7 @@ print("\nnow the real thing")
 fake_device.serial_init(serial_interface)
 fake_device.clear_eeprom()
 fake_device.start()
-helpers.sleep(0.5)
+fake_device.sleep(0.5)
 luassert.is.falsy(firmware_library.get_led(fake_device))
 
 luassert.are.equals(fake_device.serial_baud(), tonumber(baud))
@@ -42,7 +42,7 @@ local new_code = 77
 serial:write(tostring(new_code) .. "\n")
 serial:flush()
 serial:close()
-helpers.sleep(0.5)
+fake_device.sleep(0.5)
 
 firmware_library.push_button(fake_device)
 check_next(uinput_interface, new_code, 1)
@@ -53,6 +53,6 @@ check_next(uinput_interface, new_code, 0)
 luassert.is.falsy(firmware_library.get_led(fake_device))
 
 fake_device.stop()
-helpers.sleep(0.5)
+fake_device.sleep(0.5)
 
 print("DONE")

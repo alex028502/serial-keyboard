@@ -45,5 +45,5 @@ while os.execute("kill -0 " .. driver_pid) do
    -- if it ever shuts down too fast and we don't get a single sleep
    -- coverage will let us know
    print("waiting for driver to shut down nicely")
-   helpers.sleep(100)
+   os.execute("sleep 0.1")
 end

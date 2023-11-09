@@ -60,6 +60,7 @@ mono.coverage.info: $(ALL_FILES)
 	$(MAKE) clean-coverage
 	./with-lua.sh lua.$@ $(MAKE) mono $(OPTIONS)
 	! $(MAKE) assert-clean-coverage
+	@echo ^^^^^ test error - expected ^^^^^^
 	lcov $(BRANCH) --capture --directory . -o c.$@
 	lcov $(BRANCH) -a lua.$@ -a c.$@ -o $@
 mono: test-e2e newline

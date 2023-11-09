@@ -27,12 +27,10 @@ echo using $stty_path
 
 source $(dirname $0)/prep.sh
 
-echo ---- OPEN FAKE UINPUT ---
-mkfifo $dev/uinput
-echo
-
 echo
 echo ---- TEST DRIVER --------
+echo ---- setup --------------
+mkfifo $dev/uinput
 mkfifo $dev/serial
 echo ---- start driver -------
 SERIAL_KEYBOARD_DEBUG=TRUE $driver_script $driver_lib $dev/serial $dev/uinput &

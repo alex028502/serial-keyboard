@@ -67,44 +67,9 @@ local function set_key_and_try_out(setting, new_code)
 end
 
 set_key_and_try_out("88\n", 88)
-set_key_and_try_out("2", 88) -- no change
-
--- The following tests are kind of backwards - or sideways even
--- I created these tests when the branch coverage report showed me that I had a
--- bunch ifs/ands/buts in the fake implementation that were not used, and don't
--- do what the avr implementation does anyhow.
---
--- The sketch itself uses Serial.parseInt() and accepts whatever nuances come
--- along with that.  I tried out all these edge cases on the real device though
--- and wrote the mock function to behave the same way. If I even decided I
--- wanted my device to behave different from the following, I could change a few
--- of these assertions, and change the sketch maybe to match the new assertions,
--- except for two problems:
--- - We would no longer have any tests to make sure that MockSerial behaves like
--- it does on AVR
--- - The MockSerial implementation still still limited to what was visible with
--- my previous implementation, so still might need to be updated
---
--- Ideally, the test framework would be its own project, and it would be
--- verified against a lot of different sketches and use cases. (either with
--- automated tests, or by being used in a lot of projects where different people
--- complain if something isn't right - I don't know who makes sure that the
--- cores behave the same, or even behave at all - but this could be similar)
--- Then this project, the button device would only need enough tests to cover a
--- the cases that we are interested in
--- BUT DON'T WORRY I HAVE MOVED THEM TO A SPECIAL TEST FOR THE FRAMEWORK
-
-set_key_and_try_out("20x", 88) -- no change
-set_key_and_try_out("x\n", 220)
-set_key_and_try_out("x52\n", 52)
-set_key_and_try_out("77x\n", 77)
+set_key_and_try_out("7", 88)
+set_key_and_try_out("7x\n", 77)
 set_key_and_try_out("adsx\n", 77) -- no change
-set_key_and_try_out("11x12\n", 12)
-set_key_and_try_out("-3\n", -3)
-set_key_and_try_out("11-12\n", -12)
-set_key_and_try_out("11-\n", 11)
-set_key_and_try_out("88\n", 88) -- minus doesn't carry over
-set_key_and_try_out("50000\n", -15536)
 
 saved_value = 99 -- sys rq
 set_key_and_try_out(tostring(saved_value) .. "\n", saved_value)

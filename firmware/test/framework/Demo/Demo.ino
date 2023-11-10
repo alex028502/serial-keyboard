@@ -8,18 +8,10 @@ coincidental
 */
 
 const int buttonPin = 2;
-const int defaultCode = 53;
-int code;
 
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   Serial.begin(9600);
-  code = defaultCode;
-}
-
-void message(int code) {
-  Serial.print(code);
-  Serial.write(10);
 }
 
 void loop() {
@@ -28,13 +20,14 @@ void loop() {
 
   if (currentState != lastState) {
     if (currentState == LOW) {
-      message(code);
+      if (!Serial.available()) {
+        Serial.print("unavailable");
+        Serial.write(10);
+      }
+      int newCode = Serial.parseInt();
+      Serial.print(newCode);
+      Serial.write(10);
     }
   }
   lastState = currentState;
-
-  if (Serial.available() > 0) {
-    int newCode = Serial.parseInt();
-    code = newCode;
-  }
 }

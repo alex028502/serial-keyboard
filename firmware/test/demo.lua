@@ -5,16 +5,14 @@ fake_device_lib, fake_device_lib_err = package.loadlib(sut_path, "luaopen_sut")
 luassert.is.falsy(fake_device_lib_err)
 fake_device = fake_device_lib()
 
-DEFAULT_CODE = 53
 BUTTON_PIN = 2
+DEFAULT_CODE = "unavailable"
 
 function assert_message(f, number)
    local message = f:read("L")
    luassert.is.truthy(message, "something written")
    luassert.are.equals(tostring(number) .. "\n", message)
 end
-
-luassert.is.truthy(DEFAULT_CODE, "make sure it's loaded")
 
 LED_PIN = fake_device.led_builtin()
 print("led pin is " .. LED_PIN)
@@ -39,8 +37,8 @@ local function try_out(number)
    assert_message(serial, number)
 end
 
--- now again using the shortcut
 try_out(DEFAULT_CODE)
+assert_message(serial, 0)
 
 local function set_key(setting)
    serial:write(setting)
@@ -49,29 +47,65 @@ local function set_key(setting)
 end
 
 local function set_key_and_try_out(setting, new_code)
+   -- assert that we are not using this for the special cases:
+   luassert.are_not.equals(new_code, DEFAULT_CODE)
+   luassert.are_not.equals(new_code, 0)
+
    set_key(setting)
    try_out(new_code)
+   try_out(0) -- always sends a 0 for the \n
+   try_out(DEFAULT_CODE) -- now it unavailable
+   assert_message(serial, 0)
 end
 
--- TODO: confirm with real device
--- these tests were created trying out the real sketch - and then used to
--- sort out the mock library - but then a new test sketch was created, and
--- these tests were created by trying the new sketch with the mock library
--- but now they need to be fixed by trying the new demo sketch with a real
--- device
+-- these have all been tried out with a real device running this sketch
 set_key_and_try_out("88\n", 88)
-set_key_and_try_out("2", 0) -- TODO: confirm with real device!
-set_key_and_try_out("20x", 0) -- no change
-set_key_and_try_out("x\n", 220)
+set_key("2")
+try_out(DEFAULT_CODE) -- no return
+assert_message(serial, 0)
+set_key("20x")
+try_out(DEFAULT_CODE) -- no return
+assert_message(serial, 0)
+set_key_and_try_out("x\n", 220) -- finally sinks in
 set_key_and_try_out("x52\n", 52)
 set_key_and_try_out("77x\n", 77)
-set_key_and_try_out("adsx\n", 77) -- no change
-set_key_and_try_out("11x12\n", 12)
+set_key("adsx\n")
+try_out(0)
+try_out(DEFAULT_CODE)
+assert_message(serial, 0)
+set_key("11x12\n")
+try_out(11)
+try_out(12)
+try_out(0)
+try_out(DEFAULT_CODE)
+assert_message(serial, 0)
 set_key_and_try_out("-3\n", -3)
-set_key_and_try_out("11-12\n", -12)
-set_key_and_try_out("11-\n", 11)
+set_key("11-12\n")
+try_out(11)
+try_out(-12)
+try_out(0)
+try_out(DEFAULT_CODE)
+assert_message(serial, 0)
+set_key("11-\n")
+try_out(11)
+try_out(0) -- I guess the '-' on its own is like 0
+try_out(0)
+try_out(DEFAULT_CODE)
+assert_message(serial, 0)
 set_key_and_try_out("88\n", 88) -- minus doesn't carry over
 set_key_and_try_out("50000\n", -15536)
+set_key("44x55x21\n")
+set_key("22x34\n")
+try_out(44)
+try_out(55)
+try_out(21)
+try_out(22)
+try_out(34)
+try_out(0)
+try_out(DEFAULT_CODE)
+assert_message(serial, 0)
+try_out(DEFAULT_CODE)
+assert_message(serial, 0)
 
 fake_device.stop()
 fake_device.sleep(0.3)

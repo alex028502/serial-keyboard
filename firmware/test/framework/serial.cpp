@@ -4,13 +4,16 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <unistd.h>  // for write
-#include <cstring>   // for strlen
+#include <cstdint>
+#include <cstring>  // for strlen
 
 void SerialMock::init(int fd) {
   this->fd = fd;
   incoming_number[0] = 0;
   incoming_number_idx = 0;
-  outgoing_number = 0;
+  incoming_string_cursor = 0;
+  incoming_string_idx = 0;
+  incoming_line_cursor = 0;
 }
 
 void SerialMock::begin(unsigned long baud) {
@@ -32,9 +35,29 @@ void SerialMock::write(char value) {
 }
 
 int SerialMock::available() {
+  _update();
+  return incoming_string_cursor - incoming_string_idx;
+}
+
+int SerialMock::_available() {
   int bytes_available;
   ioctl(fd, FIONREAD, &bytes_available);
   return bytes_available;
+}
+
+void SerialMock::_update() {
+  while (_available()) {
+    char c;
+    read(fd, &c, 1);
+    incoming_line[incoming_line_cursor++] = c;
+    if (c == '\n') {
+      // Move the entire incoming_line to incoming_string.
+      memcpy(incoming_string + incoming_string_cursor, incoming_line,
+             incoming_line_cursor);
+      incoming_string_cursor += incoming_line_cursor;
+      incoming_line_cursor = 0;
+    }
+  }
 }
 
 int SerialMock::parseInt() {
@@ -50,31 +73,30 @@ int SerialMock::parseInt() {
     projects could confidently use this mock library knowing that we have done
     the work of comparing it to a real device.
    */
-  while (available()) {
-    char c;
-    read(fd, &c, 1);
 
-    if (!isdigit(c)) {
-      incoming_number_idx = 0;
-    }
-    if (c == '-') {
-      incoming_number_idx--;  // secret code for negative
-    }
-    if (isdigit(c)) {
-      if (incoming_number_idx < 0) {
-        incoming_number[0] = '-';
-        incoming_number_idx = 1;
-      }
+  _update();
+  incoming_number_idx = 0;
+  while (incoming_string_idx < incoming_string_cursor) {
+    char c = incoming_string[incoming_string_idx++];
+
+    if (isdigit(c) || (c == '-' && !incoming_number_idx)) {
       incoming_number[incoming_number_idx++] = c;
       incoming_number[incoming_number_idx] = 0;
-    }
-    if (c == '\n') {
-      outgoing_number = atoi(incoming_number);
+    } else if (incoming_number_idx) {
+      incoming_string_idx--;
+      break;
     }
   }
 
-  int result = outgoing_number;
-  outgoing_number = 0;
+  if (incoming_string_idx == incoming_string_cursor) {
+    // phew - made it
+    incoming_string_cursor = 0;
+    incoming_string_idx = 0;
+  }
+
+  int16_t result = atoi(incoming_number);
+  incoming_number_idx = 0;
+  incoming_number[incoming_number_idx] = 0;
   return result;
 }
 

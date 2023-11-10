@@ -1,5 +1,3 @@
-#include <cstdint>
-
 class SerialMock {
  public:
   int fd;
@@ -16,8 +14,14 @@ class SerialMock {
 
  private:
   char incoming_number[32];
-  int16_t outgoing_number;
+  char incoming_string[256];
+  char incoming_line[64];
+  int incoming_line_cursor;
+  int incoming_string_idx;     // reading
+  int incoming_string_cursor;  // writing
   int incoming_number_idx;
+  int _available();
+  void _update();
 };
 
 extern SerialMock Serial;

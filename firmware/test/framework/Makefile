@@ -14,7 +14,7 @@ headers: always
 always:
 framework.c.o: framework.c Makefile headers
 	$(COMPILE) $(CFLAGS) -I /usr/include/$(LUA) $< -o $@
-demo.o: demo.ino headers Makefile
+demo.o: Demo/Demo.ino headers Makefile
 	$(COMPILE) $(CFLAGS) -x c++ $< -o $@ -include Arduino.h -I .
 %.o: % Makefile headers
 	$(COMPILE) $(CFLAGS) $< -o $@

@@ -13,7 +13,7 @@ int code;
 
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
-  Serial.begin(11111);
+  Serial.begin(9600);
   code = defaultCode;
 }
 

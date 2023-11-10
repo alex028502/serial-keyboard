@@ -29,7 +29,7 @@ luassert.are.equals(fake_device.serial_baud(), 0)
 fake_device.start()
 fake_device.sleep(0.2)
 local baud_rate = fake_device.serial_baud()
-assert(baud_rate == 11111, baud_rate) -- this is what is in the demo sketch
+assert(baud_rate == 9600, baud_rate) -- this is what is in the demo sketch
 
 local function try_out(number)
    fake_device.digital_write(BUTTON_PIN, 0)

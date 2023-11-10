@@ -52,7 +52,7 @@ int SerialMock::parseInt() {
    */
   while (available()) {
     char c;
-    ssize_t n = read(fd, &c, 1);
+    read(fd, &c, 1);
 
     if (!isdigit(c)) {
       incoming_number_idx = 0;

@@ -25,9 +25,9 @@ void setup() {
   }
 }
 
-void message(const char* command, int code) {
+void message(const char* command, int c) {
   Serial.print(command);
-  Serial.print(code);
+  Serial.print(c);
   Serial.write(10);
 }
 

@@ -7,9 +7,13 @@ local luassert = require("luassert")
 local sut_path, firmware_lib_path, serial_path, serial_interface_path =
    table.unpack(arg)
 
-fake_device_lib, fake_device_lib_err = package.loadlib(sut_path, "luaopen_sut")
-luassert.is.falsy(fake_device_lib_err)
-fake_device = fake_device_lib()
+local function open_lib(path, name)
+   local lib, err = package.loadlib(path, name)
+   luassert.is.falsy(err)
+   return lib()
+end
+
+fake_device = open_lib(sut_path, "luaopen_sut")
 
 print("firmware specific testing library", firmware_lib_path)
 firmware_test_lib = dofile(firmware_lib_path)

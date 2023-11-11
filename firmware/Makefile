@@ -17,7 +17,7 @@ test-main: test/sut.so
 test-framework: $(FRAMEWORK)/demo.so
 	test/demo.sh $(EXE) $<
 test/sut.so: test/sketch.o $(TEST_MODULES)
-	$(CC) -shared -fPIC $(TEST_MODULES) $< $(LDFLAGS) -lpthread -o $@
+	$(CC) -shared -fPIC $^ $(LDFLAGS) -lpthread -o $@
 $(FRAMEWORK)/%.o: always
 	$(MAKE) -C $(FRAMEWORK) $*.o CFLAGS="$(CFLAGS)" CC=$(CC)
 $(FRAMEWORK)/headers $(FRAMEWORK)/demo.so: always

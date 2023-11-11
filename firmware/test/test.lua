@@ -15,7 +15,7 @@ end
 
 fake_device = open_lib(sut_path, "luaopen_sut")
 
-test_tools = open_lib(string.gsub(sut_path, "sut", "tools"), "luaopen_tools")
+test_tools = open_lib(sut_path, "luaopen_tools")
 
 print("firmware specific testing library", firmware_lib_path)
 firmware_test_lib = dofile(firmware_lib_path)

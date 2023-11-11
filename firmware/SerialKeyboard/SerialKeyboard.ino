@@ -37,7 +37,21 @@ void loop() {
   int currentState = digitalRead(buttonPin);
   int currentState2 = digitalRead(buttonPin2);
 
-  digitalWrite(LED_BUILTIN, !currentState || !currentState2);
+  /*
+    virual dom for lamp - I don't know how to test if writing to gpio every
+    iteration is worse than keeping track in variables like this. also the
+    tests don't really check - the only check the state of the lamp - just like
+    what a human looking at a device could check. but this seems like a
+    reasonable thing to do, even if we are reading from gpio every cycle so it
+    can't be that big a deal - well I have no idea if writing or reading is
+    worse.
+   */
+  static int lastLamp = 100;  // so it never matches
+  int lamp = !currentState || !currentState2;
+  if (lamp != lastLamp) {
+    lastLamp = lamp;
+    digitalWrite(LED_BUILTIN, lamp);
+  }
 
   if (currentState != lastState) {
     if (currentState == LOW) {

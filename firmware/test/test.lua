@@ -20,6 +20,7 @@ test_tools = open_lib(sut_path, "luaopen_tools")
 print("firmware specific testing library", firmware_lib_path)
 firmware_test_lib = dofile(firmware_lib_path)
 DEFAULT_CODE = test_tools.key_sysrq()
+SECOND_CODE = test_tools.key_insert() -- really second default code
 
 function assert_message(f, code, key)
    local message = f:read("L")
@@ -46,13 +47,13 @@ luassert.is.falsy(firmware_test_lib.get_led(fake_device))
 local baud_rate = fake_device.serial_baud()
 assert(baud_rate > 0, baud_rate) -- the e2e tests make sure this matches
 
-local function try_out(code)
-   firmware_test_lib.push_button(fake_device)
+local function try_out(code, secondary)
+   firmware_test_lib.push_button(fake_device, secondary)
    fake_device.sleep(1)
    luassert.is.truthy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "D", code)
 
-   firmware_test_lib.release_button(fake_device)
+   firmware_test_lib.release_button(fake_device, secondary)
    fake_device.sleep(0.2)
    luassert.is.falsy(firmware_test_lib.get_led(fake_device))
    assert_message(serial, "U", code)
@@ -60,6 +61,9 @@ end
 
 -- now again using the shortcut
 try_out(DEFAULT_CODE)
+
+-- now the other button
+try_out(SECOND_CODE, true)
 
 local function set_key(setting)
    serial:write(setting)
@@ -80,6 +84,16 @@ set_key_and_try_out("adsx\n", 77) -- no change
 saved_value = 99 -- sys rq
 set_key_and_try_out(tostring(saved_value) .. "\n", saved_value)
 
+-- use negative to set the second button
+-- (this won't really scale to more buttons)
+-- (maybe to four buttons with complex numbers)
+local new_second_code = 27
+set_key(tostring(-new_second_code) .. "\n")
+-- let's first make sure the device is still running
+try_out(saved_value)
+-- ok now let's see if our new code is set:
+try_out(new_second_code, true)
+
 fake_device.stop()
 fake_device.sleep(0.3)
 
@@ -87,6 +101,8 @@ fake_device.sleep(0.3)
 fake_device.start()
 fake_device.sleep(0.2)
 try_out(saved_value)
+
+try_out(new_second_code, true)
 
 -- but look it doesn't check eeprom every time
 fake_device.clear_eeprom()
@@ -100,6 +116,30 @@ fake_device.start()
 fake_device.sleep(0.2)
 
 try_out(DEFAULT_CODE)
+try_out(SECOND_CODE, true)
+
+-- ok now test one more thing
+-- this won't be that common but need to make sure
+firmware_test_lib.push_button(fake_device)
+fake_device.sleep(1)
+luassert.is.truthy(firmware_test_lib.get_led(fake_device))
+assert_message(serial, "D", DEFAULT_CODE)
+
+firmware_test_lib.push_button(fake_device, true)
+fake_device.sleep(1)
+luassert.is.truthy(firmware_test_lib.get_led(fake_device))
+assert_message(serial, "D", SECOND_CODE)
+
+firmware_test_lib.release_button(fake_device)
+fake_device.sleep(0.2)
+-- LED stays on as long as one button is pressed
+luassert.is.truthy(firmware_test_lib.get_led(fake_device))
+assert_message(serial, "U", DEFAULT_CODE)
+
+firmware_test_lib.release_button(fake_device, true)
+fake_device.sleep(0.2)
+luassert.is.falsy(firmware_test_lib.get_led(fake_device))
+assert_message(serial, "U", SECOND_CODE)
 
 fake_device.stop()
 fake_device.sleep(0.3)

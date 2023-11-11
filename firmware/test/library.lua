@@ -1,15 +1,18 @@
-local BUTTON_PIN = 2
-
-local function set_button_state(fake_device, state)
+local function set_button_state(fake_device, state, secondary)
+   if secondary then
+      BUTTON_PIN = 5
+   else
+      BUTTON_PIN = 2
+   end
    fake_device.digital_write(BUTTON_PIN, state)
 end
 
-local function push_button(fake_device)
-   set_button_state(fake_device, 0)
+local function push_button(fake_device, secondary)
+   set_button_state(fake_device, 0, secondary)
 end
 
-local function release_button(fake_device)
-   set_button_state(fake_device, 1)
+local function release_button(fake_device, secondary)
+   set_button_state(fake_device, 1, secondary)
 end
 
 local function get_led(fake_device)

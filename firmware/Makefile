@@ -23,7 +23,7 @@ $(FRAMEWORK)/%.o: always
 $(FRAMEWORK)/headers $(FRAMEWORK)/demo.so: always
 	$(MAKE) -C $(@D) $(@F)
 test/sketch.o: $(SKETCH) $(FRAMEWORK)/headers
-	$(CC) -c -fPIC -I test/framework -include test/framework/Arduino.h -x c++ $(CFLAGS) $< -o $@
+	$(CC) -fPIC -c -fno-exceptions -I test/framework -include test/framework/Arduino.h -x c++ $(CFLAGS) $< -o $@
 test/tools.o: test/tools.c
 	$(CC) -fPIC -c -fno-exceptions $(CFLAGS) -I /usr/include/$(EXE) $< -o $@
 test/keys.o: test/keys.c

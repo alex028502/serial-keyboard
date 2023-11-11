@@ -2,26 +2,19 @@
 
 #define SERIAL_KEYBOARD_BAUD 115200
 
-const int buttonPin = 2;
-const int buttonPin2 = 5;
-const int defaultCode = 99;    // sysrq by default
-const int defaultCode2 = 110;  // insert by default
-int code;
-int code2;
+const int buttonPin[] = {2, 5};
+const int defaultCode[] = {99, 110};  // sysrq, insert by default
+int code[2];
 
 void setup() {
-  pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(buttonPin2, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(SERIAL_KEYBOARD_BAUD);
-  code = EEPROM.read(0);
-  code2 = EEPROM.read(1);
-
-  if (code == 255) {
-    code = defaultCode;
-  }
-  if (code2 == 255) {
-    code2 = defaultCode2;
+  for (int i = 0; i < 2; i++) {
+    pinMode(buttonPin[i], INPUT_PULLUP);
+    code[i] = EEPROM.read(i);
+    if (code[i] == 255) {
+      code[i] = defaultCode[i];
+    }
   }
 }
 
@@ -32,10 +25,11 @@ void message(const char* command, int c) {
 }
 
 void loop() {
-  static int lastState = HIGH;
-  static int lastState2 = HIGH;
-  int currentState = digitalRead(buttonPin);
-  int currentState2 = digitalRead(buttonPin2);
+  static int lastState[] = {HIGH, HIGH};
+  int currentState[2];
+  for (int i = 0; i < 2; i++) {
+    currentState[i] = digitalRead(buttonPin[i]);
+  }
 
   /*
     I don't know if writing to gpio every iteration is so bad. also the
@@ -45,40 +39,30 @@ void loop() {
     can't be that big a deal - well I have no idea if writing or reading is
     worse.
    */
-  int lamp = !currentState || !currentState2;
-  int lastLamp = !lastState || !lastState2;
+  int lamp = !currentState[0] || !currentState[1];
+  int lastLamp = !lastState[0] || !lastState[1];
   if (lamp != lastLamp) {
     digitalWrite(LED_BUILTIN, lamp);
   }
 
-  if (currentState != lastState) {
-    if (currentState == LOW) {
-      message("D", code);
-    } else {
-      message("U", code);
+  for (int i = 0; i < 2; i++) {
+    if (currentState[i] != lastState[i]) {
+      if (currentState[i] == LOW) {
+        message("D", code[i]);
+      } else {
+        message("U", code[i]);
+      }
+      lastState[i] = currentState[i];
     }
-    lastState = currentState;
-  }
-
-  if (currentState2 != lastState2) {
-    if (currentState2 == LOW) {
-      message("D", code2);
-    } else {
-      message("U", code2);
-    }
-    lastState2 = currentState2;
   }
 
   if (Serial.available() > 0) {
     int newCode = Serial.parseInt();
     if (newCode != 0) {
-      if (newCode > 0) {
-        code = newCode;
-        EEPROM.write(0, code);
-      } else {  // For negative input, take the positive and assign it to code2
-        code2 = -newCode;
-        EEPROM.write(1, code2);
-      }
+      // For negative input, take the positive and assign it to code[1]
+      int i = newCode < 0;  // button #1 is the secondary button
+      code[i] = abs(newCode);
+      EEPROM.write(i, code[i]);
     }
   }
 }

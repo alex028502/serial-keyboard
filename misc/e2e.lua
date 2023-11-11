@@ -11,9 +11,10 @@ library = dofile(library_path)
 
 helpers = library.import(helper_path, "luaopen_helpers")
 fake_device = package.loadlib(sut_path, "luaopen_sut")()
+test_tools = package.loadlib(sut_path, "luaopen_tools")()
 
 firmware_library = dofile(firmware_lib_path)
-DEFAULT_CODE = firmware_library.DEFAULT_CODE
+DEFAULT_CODE = test_tools.key_sysrq()
 
 local uinput_interface = io.open(uinput_interface_path, "rb")
 local serial_interface = io.open(serial_interface_path, "r+")

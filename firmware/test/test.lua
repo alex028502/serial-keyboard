@@ -15,9 +15,11 @@ end
 
 fake_device = open_lib(sut_path, "luaopen_sut")
 
+test_tools = open_lib(sut_path, "luaopen_tools")
+
 print("firmware specific testing library", firmware_lib_path)
 firmware_test_lib = dofile(firmware_lib_path)
-DEFAULT_CODE = firmware_test_lib.DEFAULT_CODE
+DEFAULT_CODE = test_tools.key_sysrq()
 
 function assert_message(f, code, key)
    local message = f:read("L")

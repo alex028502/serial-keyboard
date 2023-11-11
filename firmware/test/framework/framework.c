@@ -94,3 +94,8 @@ int luaopen_sut(lua_State* L) {
   luaL_newlib(L, framework_functions);
   return 1;
 }
+
+// this might not be the best place for this
+void delay(float t) {
+  usleep(t * 1000);
+}

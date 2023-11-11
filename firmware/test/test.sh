@@ -28,6 +28,6 @@ function cleanup {
 trap cleanup EXIT
 
 echo ---- TEST FIRMWARE ------
-$interpreter $test_script $sut $test_lib $dev/serial $dev/serial.interface
+timeout 10 $interpreter $test_script $sut $test_lib $dev/serial $dev/serial.interface
 echo ---- SUCCESS ------------
 echo

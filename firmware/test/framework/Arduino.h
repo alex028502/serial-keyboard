@@ -9,3 +9,5 @@ extern "C" void loop() __attribute__((used));
 
 // cheat a bit here I guess
 #define abs(x) ((x) < 0 ? -(x) : (x))
+
+extern "C" void delay(float t);

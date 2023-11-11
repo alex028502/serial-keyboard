@@ -52,6 +52,7 @@ void loop() {
       } else {
         message("U", code[i]);
       }
+      delay(35);  // debounce especially the big button one on the way down
       lastState[i] = currentState[i];
     }
   }

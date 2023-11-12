@@ -12,11 +12,16 @@ headers: always
 	find . -name '*.h' | xargs cat > $@.tmp
 	diff $@.tmp $@ || mv $@.tmp $@
 always:
-framework.c.o: framework.c Makefile headers
+framework.c.o: framework.c Makefile headers .flags
 	$(COMPILE) $(CFLAGS) -I /usr/include/$(LUA) $< -o $@
-demo.o: Demo/Demo.ino headers Makefile
+demo.o: Demo/Demo.ino headers Makefile .flags
 	$(COMPILE) $(CFLAGS) -x c++ $< -o $@ -include Arduino.h -I .
-%.o: % Makefile headers
+%.o: % Makefile headers .flags
 	$(COMPILE) $(CFLAGS) $< -o $@
 demo.so: demo.o gpio.c.o framework.c.o serial.cpp.o EEPROM.cpp.o
 	$(CC) -shared -fPIC $^ $(LDFLAGS) -lpthread -o $@
+.flags: always
+	echo $(CC) > $@.tmp
+	echo $(CFLAGS) >> $@.tmp
+	echo $(LDFLAGS) >> $@.tmp
+	diff $@.tmp $@ || mv $@.tmp $@

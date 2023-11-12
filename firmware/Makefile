@@ -23,13 +23,18 @@ $(FRAMEWORK)/%.o: always
 	$(MAKE) -C $(FRAMEWORK) $*.o
 $(FRAMEWORK)/headers $(FRAMEWORK)/demo.so: always
 	$(MAKE) -C $(@D) $(@F)
-test/sketch.o: $(SKETCH) $(FRAMEWORK)/headers
+test/sketch.o: $(SKETCH) $(FRAMEWORK)/headers .flags
 	$(CC) -fPIC -c -fno-exceptions -I test/framework -include test/framework/Arduino.h -x c++ $(CFLAGS) $< -o $@
-test/tools.o: test/tools.c
+test/tools.o: test/tools.c .flags
 	$(CC) -fPIC -c -fno-exceptions $(CFLAGS) -I /usr/include/$(EXE) $< -o $@
-test/keys.o: test/keys.c
+test/keys.o: test/keys.c .flags
 	$(CC) -fPIC -c -fno-exceptions $(CFLAGS) -I /usr/include/linux $< -o $@
 always:
+.flags: always
+	echo $(CC) > $@.tmp
+	echo $(CFLAGS) >> $@.tmp
+	echo $(LDFLAGS) >> $@.tmp
+	diff $@.tmp $@ || mv $@.tmp $@
 clean:
 	find test -name '*.so' -o -name '*.o' -o -name '*.gc*' | xargs rm -f
 	find test -name 'luacov.*.out' | xargs rm -f

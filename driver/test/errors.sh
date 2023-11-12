@@ -2,11 +2,12 @@
 
 set -e
 
+interpreter=$1
+shift
+
 driver_script=$(realpath $1)
 shift
 library=$(dirname $0)/library.lua
-
-interpreter=lua5.4
 
 real_driver_lib=$(realpath $1)
 shift

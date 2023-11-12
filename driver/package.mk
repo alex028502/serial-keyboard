@@ -1,5 +1,7 @@
 .PHONY: always
 
+include constants.mk
+
 GIT_HASH := dev
 
 serial-keyboard.deb: package
@@ -16,7 +18,7 @@ package:
 	$(MAKE) -f $(MAKEFILE_LIST) $@/usr/share/serial-keyboard
 	$(MAKE) -f $(MAKEFILE_LIST) $@/DEBIAN/control
 package/DEBIAN/control: resources/control
-	sed "s/{ VERSION }/$(shell date +"%Y%m%d%H%M%S").$(GIT_HASH)/" $< > $@
+	sed "s/{ VERSION }/$(shell date +"%Y%m%d%H%M%S").$(GIT_HASH)/" $< | sed 's/{ LUA }/$(LUA)/' > $@
 package/usr/share/serial-keyboard: baud.txt serial_keyboard.lua serial_keyboard_lib.main.so start.sh
 	mkdir -p $@
 	cp $^ $@

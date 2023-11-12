@@ -6,7 +6,8 @@
 PROJECT = serial_keyboard
 PROJECT_LIB = $(PROJECT)_lib
 
-LUA = lua5.4
+include constants.mk
+
 LUA_SRC = /usr/include/$(LUA)
 
 CC = gcc
@@ -25,11 +26,14 @@ bytes: bytes.o main/ioctl.o
 	$(CC) -o $@ $^ $(LDFLAGS) -fPIC
 %.o: %.c Makefile
 	$(CC) -c -o $@ $(CFLAGS) -fPIC $< -I $(LUA_SRC)
-test: test-main test-error test-ioctl test-meta
+test: test-main test-error test-ioctl test-meta test-version
+test-version: start.sh
+	@echo make sure $(LUA) is the version used by $<
+	grep $(LUA) start.sh
 test-main: $(PROJECT_LIB).test.so test/helpers.so
-	test/driver.sh start.sh $^
+	test/driver.sh $(LUA) start.sh $^
 test-error: $(PROJECT_LIB).main.so $(PROJECT_LIB).test.so test/helpers.so
-	test/errors.sh start.sh $^
+	test/errors.sh $(LUA) start.sh $^
 test-ioctl: bytes
 	test/ioctl.sh $<
 test-meta: test/helpers.so

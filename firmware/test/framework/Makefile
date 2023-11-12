@@ -8,15 +8,14 @@ LDFLAGS =
 COMPILE = $(CC) -fPIC -c -fno-exceptions
 LUA = lua5.4
 
-headers: always
-	find . -name '*.h' | xargs cat > $@.tmp
-	diff $@.tmp $@ || mv $@.tmp $@
+HEADERS := $(shell find . -name '*.h')
+
 always:
-framework.c.o: framework.c Makefile headers .flags
+framework.c.o: framework.c Makefile $(HEADERS) .flags
 	$(COMPILE) $(CFLAGS) -I /usr/include/$(LUA) $< -o $@
-demo.o: Demo/Demo.ino headers Makefile .flags
+demo.o: Demo/Demo.ino $(HEADERS) Makefile .flags
 	$(COMPILE) $(CFLAGS) -x c++ $< -o $@ -include Arduino.h -I .
-%.o: % Makefile headers .flags
+%.o: % Makefile $(HEADERS) .flags
 	$(COMPILE) $(CFLAGS) $< -o $@
 demo.so: demo.o gpio.c.o framework.c.o serial.cpp.o EEPROM.cpp.o
 	$(CC) -shared -fPIC $^ $(LDFLAGS) -lpthread -o $@

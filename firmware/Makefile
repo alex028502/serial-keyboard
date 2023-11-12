@@ -12,6 +12,7 @@ LDFLAGS =
 
 TEST_MODULES = $(FRAMEWORK)/serial.cpp.o $(FRAMEWORK)/EEPROM.cpp.o $(FRAMEWORK)/gpio.c.o $(FRAMEWORK)/framework.c.o
 
+test: test-main test-framework
 test-main: test/sut.so
 	test/test.sh $(EXE) $<
 test-framework: $(FRAMEWORK)/demo.so

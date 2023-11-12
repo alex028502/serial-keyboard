@@ -20,7 +20,7 @@ test-framework: $(FRAMEWORK)/demo.so
 test/sut.so: test/sketch.o $(TEST_MODULES) test/tools.o test/keys.o
 	$(CC) -shared -fPIC $^ $(LDFLAGS) -lpthread -o $@
 $(FRAMEWORK)/%.o: always
-	$(MAKE) -C $(FRAMEWORK) $*.o CFLAGS="$(CFLAGS)" CC=$(CC)
+	$(MAKE) -C $(FRAMEWORK) $*.o
 $(FRAMEWORK)/headers $(FRAMEWORK)/demo.so: always
 	$(MAKE) -C $(@D) $(@F)
 test/sketch.o: $(SKETCH) $(FRAMEWORK)/headers

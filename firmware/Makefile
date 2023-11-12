@@ -1,10 +1,11 @@
+.SUFFIXES:
 .PHONY: test coverage always
 
 SKETCH = SerialKeyboard/SerialKeyboard.ino
 
-EXE = lua5.4
-
 FRAMEWORK = test/framework
+
+include $(FRAMEWORK)/constants.mk
 
 CC = gcc
 CFLAGS =
@@ -14,9 +15,9 @@ TEST_MODULES = $(FRAMEWORK)/serial.cpp.o $(FRAMEWORK)/EEPROM.cpp.o $(FRAMEWORK)/
 
 test: test-main test-framework
 test-main: test/sut.so
-	test/test.sh $(EXE) $<
+	test/test.sh $(LUA) $<
 test-framework: $(FRAMEWORK)/demo.so
-	$(FRAMEWORK)/test.sh $(EXE) $<
+	$(FRAMEWORK)/test.sh $(LUA) $<
 test/sut.so: test/sketch.o $(TEST_MODULES) test/tools.o test/keys.o
 	$(CC) -shared -fPIC $^ $(LDFLAGS) -lpthread -o $@
 $(FRAMEWORK)/%.o: always
@@ -26,7 +27,7 @@ $(FRAMEWORK)/headers $(FRAMEWORK)/demo.so: always
 test/sketch.o: test/framework/Arduino.h $(SKETCH) .flags
 	$(CC) -fPIC -c -fno-exceptions -I test/framework -include $< -x c++ $(CFLAGS) $(SKETCH) -o $@
 test/tools.o: test/tools.c .flags
-	$(CC) -fPIC -c -fno-exceptions $(CFLAGS) -I /usr/include/$(EXE) $< -o $@
+	$(CC) -fPIC -c -fno-exceptions $(CFLAGS) -I /usr/include/$(LUA) $< -o $@
 test/keys.o: test/keys.c .flags
 	$(CC) -fPIC -c -fno-exceptions $(CFLAGS) -I /usr/include/linux $< -o $@
 always:

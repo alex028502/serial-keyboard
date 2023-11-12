@@ -1,12 +1,13 @@
 .SUFFIXES:
 .PHONY: demo always
 
+include constants.mk
+
 CC = gcc
 CFLAGS =
 LDFLAGS =
 # -fno-exceptions https://stackoverflow.com/a/42078101
 COMPILE = $(CC) -fPIC -c -fno-exceptions
-LUA = lua5.4
 
 HEADERS := $(shell find . -name '*.h')
 
@@ -24,3 +25,5 @@ demo.so: demo.o gpio.c.o framework.c.o serial.cpp.o EEPROM.cpp.o
 	echo $(CFLAGS) >> $@.tmp
 	echo $(LDFLAGS) >> $@.tmp
 	diff $@.tmp $@ || mv $@.tmp $@
+version:
+	@echo $(LUA)

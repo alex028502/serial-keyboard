@@ -8,7 +8,7 @@ sut=$(realpath $1)
 
 echo ------------------ FRAMEWORK TEST ----------------------
 # I predict none of this will work if there are spaces in paths
-test_script=$(dirname $0)/demo.lua
+test_script=$(dirname $0)/test.lua
 
 dev=dev
 rm -rf $dev

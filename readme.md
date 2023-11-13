@@ -1,3 +1,5 @@
+[![Coverage Badge](https://alex028502.github.io/serial-keyboard/badge.png)](https://alex028502.github.io/serial-keyboard/)
+
 ## Home made keyboard with an MCU that doesn't support HID
 
 ![big button in box connected by usb to keyboard](./docs/big-button.jpg)

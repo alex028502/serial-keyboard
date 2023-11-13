@@ -1,4 +1,5 @@
 [![Coverage Badge](https://alex028502.github.io/serial-keyboard/badge.png)](https://alex028502.github.io/serial-keyboard/)
+<br /><small>(click the badge for the coverage report - it even has bash in it)</small>
 
 ## Home made keyboard with an MCU that doesn't support HID
 

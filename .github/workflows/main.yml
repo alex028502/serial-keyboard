@@ -100,3 +100,7 @@ jobs:
         shell: bash
         run: |
           ! find . -name 'luacov*' -o -name '*.gc*' | grep '.'
+      - name: publish
+        uses: crazy-max/ghaction-github-pages@v2.5.0
+        with:
+          build_dir: report

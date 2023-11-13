@@ -40,6 +40,11 @@ jobs:
         with:
           name: coverage
           path: ./report
+      - name: publish
+        if: github.ref == 'refs/heads/master'
+        uses: crazy-max/ghaction-github-pages@v2.5.0
+        with:
+          build_dir: report
       - name: coverage check
         shell: bash
         run: make coverage-check
@@ -62,10 +67,6 @@ jobs:
         with:
           name: serial-keyboard-${{ env.sha_short }}.deb
           path: ./driver/serial-keyboard.deb
-      - name: publish
-        uses: crazy-max/ghaction-github-pages@v2.5.0
-        with:
-          build_dir: report
   subprojects-job:
     runs-on: ubuntu-latest
     strategy:

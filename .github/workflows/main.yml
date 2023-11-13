@@ -45,6 +45,8 @@ jobs:
         uses: crazy-max/ghaction-github-pages@v2.5.0
         with:
           build_dir: report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: coverage check
         shell: bash
         run: make coverage-check

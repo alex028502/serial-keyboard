@@ -26,7 +26,7 @@ coverage-100: coverage.info
 report: coverage.info tests.desc
 	rm -rf $@
 	genhtml $< --output-directory $@ --description-file tests.desc --show-details --branch-coverage
-	lcov --summary $< | grep 'lines' | awk '{ print $$2 }' | xargs -I {} convert -font Arial -size 200x50 xc:green -fill white -gravity center -pointsize 20 -draw "text 0,0 '{} Coverage'" $@/badge.png
+	lcov --summary $< | grep 'lines' | awk '{ print $$2 }' | xargs -I {} convert -font DejaVu-Sans-Bold -size 200x50 xc:green -fill white -gravity center -pointsize 20 -draw "text 0,0 '{} Coverage'" $@/badge.png
 bash-tools:
 	! misc/if-else.sh misc/if-else.txt
 	@echo ^^^^^ test error - expected ^^^^^^

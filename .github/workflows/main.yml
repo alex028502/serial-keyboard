@@ -62,6 +62,10 @@ jobs:
         with:
           name: serial-keyboard-${{ env.sha_short }}.deb
           path: ./driver/serial-keyboard.deb
+      - name: publish
+        uses: crazy-max/ghaction-github-pages@v2.5.0
+        with:
+          build_dir: report
   subprojects-job:
     runs-on: ubuntu-latest
     strategy:
@@ -100,7 +104,3 @@ jobs:
         shell: bash
         run: |
           ! find . -name 'luacov*' -o -name '*.gc*' | grep '.'
-      - name: publish
-        uses: crazy-max/ghaction-github-pages@v2.5.0
-        with:
-          build_dir: report

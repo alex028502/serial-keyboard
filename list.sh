@@ -10,4 +10,11 @@ else
 fi
 
 # if it has a space it's not a source file
-find . -type f | grep -v '.git' | sed 's/ /SPACE/' | grep -v SPACE | xargs git check-ignore -vn | grep '::' | cut -c4- | grep -E "$regex"
+find . -type f |
+    grep -v '.git' |
+    sed 's/ /SPACE/' |
+    grep -v SPACE |
+    xargs git check-ignore -vn |
+    grep '::' |
+    cut -c4- |
+    grep -E "$regex"

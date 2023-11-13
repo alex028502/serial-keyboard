@@ -6,7 +6,10 @@ on:
       - test-*
   schedule:
     - cron: '0 0 1 * *'
-
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   main-job:
     environment:

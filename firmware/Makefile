@@ -16,7 +16,7 @@ test: test-main test-framework
 test-main: test/sut.so
 	test/test.sh $(EXE) $<
 test-framework: $(FRAMEWORK)/demo.so
-	$(FRAMEWORK)/demo.sh $(EXE) $<
+	$(FRAMEWORK)/test.sh $(EXE) $<
 test/sut.so: test/sketch.o $(TEST_MODULES) test/tools.o test/keys.o
 	$(CC) -shared -fPIC $^ $(LDFLAGS) -lpthread -o $@
 $(FRAMEWORK)/%.o: always

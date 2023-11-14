@@ -39,6 +39,23 @@ a user-space driver in Lua and C with some cool tests
 * [Idea for testing Arduino sketches](./firmware)
 a demo for a test framework that mocks common Arduino libraries
 
+#### The point
+
+I think this project has three main points
+* If you want to make a keyboard - you don't _have_ to make your MCU talk HID.
+You can make your microcomputer understand anything!
+* MicroPython, CircuitPython, TinyGo are awesome, but having to use C and C++ is
+not so bad if you can write tests in a high level language, since testing is
+most of the code you write anyhow. (see the next point)
+* I don't understand how people who claim to write less "test code" than
+"production code" are actually testing anything at all. The
+[arduino sketch](firmware/SerialKeyboard/SerialKeyboard.ino) is 69 lines
+including comments - The test is 242 lines of just the high level lua without
+the framework, as well as 32 lines of bash for setup. That's what it took to
+test well enough to follow a red green refactor cycle when I added a second
+button. Am I doing it completely wrong? Or are all the people with fewer tests
+than "real work" just pretending?
+
 ### Design Choices and stuff
 
 If you are wondering about weird "architectural" decisions I made or didn't

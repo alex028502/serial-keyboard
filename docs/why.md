@@ -30,10 +30,8 @@ especially my Macbook Air when I am sitting at a table at home with a keyboard
 and screen, but also my work computer, when I am working late and nobody else
 is around an I get my loud keyboard out of its secret hiding spot.
 
-Also, I don't think you can exactly remap SysRq because of the way the Kernel
+Also, I don't think you can always remap SysRq because of the way the Kernel
 [intercepts it](https://github.com/torvalds/linux/blob/b85ea95d086471afb4ad062012a4d73cd328fa86/drivers/tty/sysrq.c#L852)
-but you probably can just configure different keys for screenshots, but I think
-even that is difficult in some environments.
 
 ### Normal keyboard on my mac
 
